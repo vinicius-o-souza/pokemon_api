@@ -2,6 +2,9 @@
   "name": "vinicius-o-souza/pokemon_api",
   "description": "A Drupal 10 module that pull content from the Pokemon API and save into Drupal",
   "type": "drupal-module",
+  "keywords": ["Drupal", "Pokemon"],
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://github.com/vinicius-o-souza/pokemon_api",
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
