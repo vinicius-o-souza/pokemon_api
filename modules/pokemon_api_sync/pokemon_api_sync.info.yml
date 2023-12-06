@@ -1,0 +1,7 @@
+name: 'Pokemon API Sync'
+type: module
+description: 'A Drupal 10 module that pull content from the Pokemon API and save into Drupal'
+package: Custom
+core_version_requirement: ^10
+dependencies:
+  - custom:pokemon_api

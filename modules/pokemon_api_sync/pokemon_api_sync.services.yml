@@ -1,0 +1,22 @@
+services:
+  logger.channel.pokemon_api_sync:
+    parent: logger.channel_base
+    arguments: ['pokemon_api_sync']
+
+  pokemon_api_sync.node_entity:
+    class: \Drupal\pokemon_api_sync\NodeEntity
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync']
+    tags:
+      - { name: service }
+  pokemon_api_sync.term_entity:
+    class: \Drupal\pokemon_api_sync\TermEntity
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync']
+    tags:
+      - { name: service }
+
+  # Sync Services
+  pokemon_api_sync.type_sync:
+    class: \Drupal\pokemon_api_sync\Sync\TypeSync
+    arguments: ['@pokemon_api_sync.term_entity', '@pokemon_api.type_api']
+    tags:
+      - { name: service }
