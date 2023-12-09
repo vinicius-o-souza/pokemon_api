@@ -5,14 +5,15 @@ namespace Drupal\pokemon_api_sync;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Class NodeEntity.
+ * Sync node entity.
  */
-class NodeEntity extends Entity {
+abstract class SyncNodeEntity extends SyncEntity {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  protected function getStorageClass(): EntityStorageInterface {
+  public function getStorageClass(): EntityStorageInterface {
     return $this->entityTypeManager->getStorage('node');
   }
+
 }

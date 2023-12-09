@@ -3,38 +3,31 @@
 namespace Drupal\pokemon_api;
 
 use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class for HttpRequest
+ * Class for HttpRequest.
  */
 abstract class HttpRequest implements HttpRequestInterface {
 
   /**
-   * @var \GuzzleHttp\ClientInterface
-   *   The http_client service.
-  */
-  protected ClientInterface $client;
-
-  /**
    * Constructs a new instance of the HttpRequest.
-   * 
+   *
    * @param \GuzzleHttp\ClientInterface $client
    *   The http_client service.
-  */
-  public function __construct(ClientInterface $client) {
-    $this->client = $client;
-  }
+   */
+  public function __construct(protected readonly ClientInterface $client) {}
 
   /**
-   * @inheritdoc
-  */
-  public function get(string $url, array $header, array $params): Response {
+   * {@inheritdoc}
+   */
+  public function get(string $url, array $header, array $params): ResponseInterface {
     $response = $this->client->request('GET', $url, [
       'headers' => $header,
-      'query' => $params
+      'query' => $params,
     ]);
 
     return $response;
   }
+
 }

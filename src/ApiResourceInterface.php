@@ -5,7 +5,7 @@ namespace Drupal\pokemon_api;
 use Drupal\pokemon_api\Resource\Resource;
 
 /**
- * Interface for PokeApiInterface
+ * Interface for ApiResourceInterface.
  */
 interface ApiResourceInterface {
 
@@ -14,6 +14,7 @@ interface ApiResourceInterface {
    *
    * @return \Drupal\pokemon_api\Resource\Resource[]
    *   The resources.
+   *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function getAllResources(): array;
@@ -23,8 +24,10 @@ interface ApiResourceInterface {
    *
    * @param int $id
    *   The id of the resource.
+   *
    * @return \Drupal\pokemon_api\Resource\Resource
    *   The resources.
+   *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
   public function getResource(int $id): Resource;

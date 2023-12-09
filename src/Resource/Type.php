@@ -2,66 +2,68 @@
 
 namespace Drupal\pokemon_api\Resource;
 
+use Drupal\pokemon_api\Translation;
+
 /**
- * Class Type.
+ * Resource Type class.
  */
 class Type extends Resource {
 
   /**
    * The damage relations.
    *
-   * @var array
+   * @var array|null
    */
-  private array $damageRelations;
+  private array|null $damageRelations;
 
   /**
    * The game indices.
    *
-   * @var array
+   * @var array|null
    */
-  private array $gameIndices;
+  private array|null $gameIndices;
 
   /**
    * The generation.
    *
-   * @var array
+   * @var array|null
    */
-  private array $generation;
+  private array|null $generation;
 
   /**
    * The move damage class.
    *
-   * @var array
+   * @var array|null
    */
-  private array $moveDamageClass;
+  private array|null $moveDamageClass;
 
   /**
    * The moves.
    *
-   * @var array
+   * @var array|null
    */
-  private array $moves;
+  private array|null $moves;
 
   /**
    * The names.
    *
-   * @var array
+   * @var \Drupal\pokemon_api\Translation|null
    */
-  private array $names;
+  private Translation|null $names;
 
   /**
    * The past damage relations.
    *
-   * @var array
+   * @var array|null
    */
-  private array $pastDamageRelations;
+  private array|null $pastDamageRelations;
 
   /**
    * The pokemon.
    *
-   * @var array
+   * @var array|null
    */
-  private array $pokemon;
+  private array|null $pokemon;
 
   /**
    * The endpoint.
@@ -79,7 +81,7 @@ class Type extends Resource {
   public static function getEndpoint(): string {
     return self::ENDPOINT;
   }
-  
+
   /**
    * Get the damage relations.
    *
@@ -183,10 +185,10 @@ class Type extends Resource {
   /**
    * Get the names.
    *
-   * @return array
+   * @return \Drupal\pokemon_api\Translation|null
    *   The names.
    */
-  public function getNames(): array {
+  public function getNames(): ?Translation {
     return $this->names;
   }
 
@@ -197,7 +199,7 @@ class Type extends Resource {
    *   The names.
    */
   public function setNames(array $names) {
-    $this->names = $names;
+    $this->names = new Translation($names);
   }
 
   /**

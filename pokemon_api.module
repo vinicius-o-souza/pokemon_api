@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Pokemon API module.
+ */
+
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**

@@ -6,7 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Class SettingsForm.
+ * Form to set pokemon_api configurations.
  */
 final class SettingsForm extends ConfigFormBase {
 

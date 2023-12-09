@@ -4,11 +4,10 @@ namespace Drupal\pokemon_api\ApiResource;
 
 use Drupal\pokemon_api\ApiResourceInterface;
 use Drupal\pokemon_api\PokeApi;
-use Drupal\pokemon_api\Resource\Resource;
 use Drupal\pokemon_api\Resource\Type;
 
 /**
- * Class TypeApi
+ * Class TypeApi to manage Types.
  */
 class TypeApi implements ApiResourceInterface {
 
@@ -23,11 +22,11 @@ class TypeApi implements ApiResourceInterface {
   ) {}
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getAllResources(): array {
     $response = $this->pokeApi->getAllResources(Type::getEndpoint());
-    
+
     $types = [];
     foreach ($response as $resource) {
       $type = new Type($resource['name'], $resource['url']);
@@ -39,14 +38,12 @@ class TypeApi implements ApiResourceInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getResource(int $id): Type {
     $response = $this->pokeApi->getResource(Type::getEndpoint(), $id);
 
-    dd($response);
-
-    $type = new Type($response['name'], $response['url']);
+    $type = new Type($response['name'], NULL, $response['id']);
     $type->setDamageRelations($response['damage_relations']);
     $type->setGameIndices($response['game_indices']);
     $type->setGeneration($response['generation']);

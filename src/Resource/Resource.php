@@ -3,7 +3,7 @@
 namespace Drupal\pokemon_api\Resource;
 
 /**
- * Class Resource.
+ * Abtract Resource class to get from Pokemon API.
  */
 abstract class Resource {
 
@@ -19,9 +19,9 @@ abstract class Resource {
    */
   public function __construct(
     protected string $name,
-    protected string $url,
+    protected string|null $url = NULL,
     protected int|null $id = NULL
-  ){
+  ) {
     if (!$id) {
       $this->id = $this->extractIdFromUrl($url);
     }
@@ -34,6 +34,19 @@ abstract class Resource {
    *   The endpoint.
    */
   abstract public static function getEndpoint(): string;
+
+  /**
+   * Get the field.
+   *
+   * @param string $field
+   *   The field.
+   *
+   * @return mixed
+   *   The field value.
+   */
+  public function get(string $field): mixed {
+    return $this->$field;
+  }
 
   /**
    * Get the name.
@@ -99,9 +112,10 @@ abstract class Resource {
    * Extract the ID from the URL.
    *
    * @param string $url
-   *  The URL.
+   *   The URL.
+   *
    * @return int
-   *  The ID from the URL.
+   *   The ID from the URL.
    */
   protected function extractIdFromUrl(string $url): int {
     $parts = explode('/', $url);
@@ -110,4 +124,5 @@ abstract class Resource {
     }
     return (int) end($parts);
   }
+
 }

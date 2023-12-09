@@ -2,55 +2,79 @@
 
 namespace Drupal\pokemon_api_sync\Sync;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\pokemon_api\ApiResource\TypeApi;
+use Drupal\pokemon_api\Resource\Resource;
 use Drupal\pokemon_api\Resource\Type;
-use Drupal\pokemon_api_sync\TermEntity;
+use Drupal\pokemon_api_sync\SyncInterface;
+use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
- * Class TypeSync.
+ * Sync Pokemon Type taxonomy.
  */
-class TypeSync {
+class TypeSync extends SyncTermEntity implements SyncInterface {
 
   /**
    * Constructs a TypeSync object.
    */
   public function __construct(
-    private readonly TermEntity $termEntity,
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LoggerChannelInterface $logger,
     private readonly TypeApi $typeApi
   ) {}
 
   /**
-   * Command to sync pokemon types.
+   * {@inheritdoc}
    */
   public function syncAll(): void {
-    $endpoint = Type::getEndpoint();
-    $types = $this->typeApi->getAllResources($endpoint);
+    $types = $this->typeApi->getAllResources();
 
     foreach ($types as $type) {
       $this->sync($type);
     }
   }
 
-
-   /**
-   * Synchronizes a Type object.
-   *
-   * @param Type $type
-   *  The Type object to synchronize.
-   * @return void
-   * @throws \Exception
+  /**
+   * {@inheritdoc}
    */
-  public function sync(Type $type): void {
+  public function sync(Resource $type): void {
     $type = $this->typeApi->getResource($type->getId());
-    
-    $data = [];
-    $term = $this->termEntity->readEntity($type->getId());
+
+    $term = $this->readEntity($type->getId());
+    $data = $this->getDataFields($type);
+
     if ($term) {
-      $this->termEntity->updateEntity($term, $data);
+      $term = $this->updateEntity($term, $data);
     }
     else {
-      $this->termEntity->createEntity($data);
+      $term = $this->createEntity($data);
+    }
+
+    if ($term) {
+      $translatableFields = $this->getTranslatableFields($type);
+      $this->addTranslation($term, $translatableFields);
     }
   }
-  
+
+  /**
+   * {@inheritdoc}
+   */
+  private function getDataFields(Type $type): array {
+    return [
+      'name' => strtoupper($type->getName()),
+      'vid' => 'pokemon_type',
+      'field_pokeapi_id' => $type->getId(),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  private function getTranslatableFields(Type $type): array {
+    return [
+      'name' => $type->getNames(),
+    ];
+  }
+
 }

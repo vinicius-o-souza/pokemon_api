@@ -5,14 +5,15 @@ namespace Drupal\pokemon_api_sync;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Class TermEntity.
+ * Sync taxonomy term entity.
  */
-class TermEntity extends Entity {
+abstract class SyncTermEntity extends SyncEntity {
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
-  protected function getStorageClass(): EntityStorageInterface {
+  public function getStorageClass(): EntityStorageInterface {
     return $this->entityTypeManager->getStorage('taxonomy_term');
   }
+
 }

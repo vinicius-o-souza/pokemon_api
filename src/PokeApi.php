@@ -6,20 +6,20 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use GuzzleHttp\ClientInterface;
 
 /**
- * Class for PokeApi
+ * Class for PokeApi.
  */
 class PokeApi extends HttpRequest implements PokeApiInterface {
 
   /**
    * The limit.
-   * 
+   *
    * @var int
    */
   private const LIMIT = 10000;
 
   /**
    * The Pokemon API Url.
-   * 
+   *
    * @var string
    */
   protected string $pokemonApiUrl;
@@ -38,12 +38,12 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getAllResources(string $endpoint): array {
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
-      'limit' => self::LIMIT
+      'limit' => self::LIMIT,
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
@@ -51,13 +51,13 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getResourcesPagination(string $endpoint, int $limit, int $offset): array {
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
       'limit' => $limit,
-      'offset' => $offset
+      'offset' => $offset,
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
@@ -65,7 +65,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   }
 
   /**
-   * @inheritdoc
+   * {@inheritdoc}
    */
   public function getResource(string $endpoint, int $id): array {
     $url = $this->pokemonApiUrl . $endpoint . '/' . $id;

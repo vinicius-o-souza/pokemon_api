@@ -10,10 +10,11 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Implements hook_help().
  */
-function pokemon_api_sync_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {
-    case 'help.page.pokemon_api_sync':
-      $output = 'Help Page';
-      return $output;
+function pokemon_api_sync_help(string $route_name, RouteMatchInterface $route_match): string {
+  if ($route_name == 'help.page.pokemon_api_sync') {
+    $output = 'Help Page';
+    return $output;
   }
+
+  return '';
 }
