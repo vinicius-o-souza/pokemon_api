@@ -1,0 +1,18 @@
+uuid: 22750508-90a3-405d-9fbc-2577d59d2327
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.pokemon
+id: node.pokemon.title
+field_name: title
+entity_type: node
+bundle: pokemon
+label: Name
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
