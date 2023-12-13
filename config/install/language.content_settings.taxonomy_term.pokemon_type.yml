@@ -1,0 +1,16 @@
+uuid: 6bf1eaf3-bca4-40e6-93cd-19aaa26b88cf
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.pokemon_type
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: taxonomy_term.pokemon_type
+target_entity_type_id: taxonomy_term
+target_bundle: pokemon_type
+default_langcode: site_default
+language_alterable: true
