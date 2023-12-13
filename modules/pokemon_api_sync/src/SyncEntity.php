@@ -110,17 +110,17 @@ abstract class SyncEntity implements SyncEntityInterface {
    *   The content entity with added translations.
    */
   protected function addTranslation(ContentEntityBase $entity, array $fields): ContentEntityBase {
-    foreach ($fields as $field) {
+    foreach ($fields as $key => $field) {
       if ($field instanceof Translation) {
         if ($field->getValue(Translation::ES_LANGUAGE)) {
           $entity->hasTranslation('es') ?: $entity->addTranslation('es', [
-            'name' => $field->getValue(Translation::ES_LANGUAGE),
+            $key => $field->getValue(Translation::ES_LANGUAGE),
           ]);
         }
 
         if ($field->getValue(Translation::PT_BR_LANGUAGE)) {
           $entity->hasTranslation('pt-br') ?: $entity->addTranslation('pt-br', [
-            'name' => $field->getValue(Translation::PT_BR_LANGUAGE),
+            $key => $field->getValue(Translation::PT_BR_LANGUAGE),
           ]);
         }
       }

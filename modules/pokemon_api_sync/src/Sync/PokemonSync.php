@@ -59,6 +59,16 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     else {
       $node = $this->createEntity($data);
     }
+
+    if ($node) {
+      $node->hasTranslation('es') ?: $node->addTranslation('es', [
+        'title' => $pokemon->getName(),
+      ]);
+      $node->hasTranslation('pt-br') ?: $node->addTranslation('pt-br', [
+        'title' => $pokemon->getName(),
+      ]);
+      $node->save(); 
+    }
   }
 
   /**
@@ -127,6 +137,15 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     }
 
     return $typeIds;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  private function getTranslatableFields(Pokemon $pokemon): array {
+    return [
+      'title' => ucfirst($pokemon->getName()),
+    ];
   }
 
 }
