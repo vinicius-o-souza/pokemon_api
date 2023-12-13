@@ -70,7 +70,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
       'type' => 'pokemon',
       'title' => ucfirst($pokemon->getName()),
       'field_pokeapi_id' => $pokemon->getId(),
-      'field_pokemon_base_experience' => $pokemon->getBaseExperience(),
+      'field_pokemon_experience' => $pokemon->getBaseExperience(),
       'field_pokemon_height' => $pokemon->getHeight(),
       'field_pokemon_order' => $pokemon->getOrder(),
       'field_pokemon_weight' => $pokemon->getWeight(),
@@ -108,6 +108,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    *
    * @param array $types
    *   An array of Pokemon type terms from the PokeAPI.
+   * 
    * @return array
    *   An array of Pokemon type term IDs.
    */
