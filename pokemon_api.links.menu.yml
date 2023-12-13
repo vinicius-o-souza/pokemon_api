@@ -1,0 +1,6 @@
+pokemon_api.settings:
+  title: Pokemon API
+  description: 'Pokemon API Settings Page.'
+  parent: system.admin_config
+  route_name: pokemon_api.settings
+  weight: 10

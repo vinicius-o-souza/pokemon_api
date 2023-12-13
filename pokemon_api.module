@@ -2,5 +2,23 @@
 
 /**
  * @file
+ * Pokemon API module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * @file
  * Primary module hooks for Pokemon API module.
  */
+
+/**
+ * Implements hook_help().
+ */
+function pokemon_api_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.pokemon_api':
+      $output = 'Help Page';
+      return $output;
+  }
+}

@@ -1,0 +1,23 @@
+uuid: 27449cbf-66e8-405f-9043-4dc9d2d54cb2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_pokemon_height
+    - node.type.pokemon
+id: node.pokemon.field_pokemon_height
+field_name: field_pokemon_height
+entity_type: node
+bundle: pokemon
+label: Height
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

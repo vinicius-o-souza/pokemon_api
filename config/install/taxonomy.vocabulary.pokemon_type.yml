@@ -1,0 +1,8 @@
+uuid: 5e074ba6-9777-4177-b537-51548e398409
+langcode: en
+status: true
+dependencies: {  }
+name: 'Pokemon Type'
+vid: pokemon_type
+description: 'List of available pokemons'
+weight: 0

@@ -1,0 +1,7 @@
+pokemon_api.settings:
+  path: '/admin/config/pokemon/settings'
+  defaults:
+    _title: 'Pokemon API Settings'
+    _form: 'Drupal\pokemon_api\Form\SettingsForm'
+  requirements:
+    _permission: 'administer site configuration'

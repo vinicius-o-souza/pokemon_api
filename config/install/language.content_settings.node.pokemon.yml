@@ -1,0 +1,16 @@
+uuid: 2826c5c1-abd0-411f-945b-eef55b242b46
+langcode: en
+status: true
+dependencies:
+  config:
+    - node.type.pokemon
+  module:
+    - content_translation
+third_party_settings:
+  content_translation:
+    enabled: true
+id: node.pokemon
+target_entity_type_id: node
+target_bundle: pokemon
+default_langcode: site_default
+language_alterable: false

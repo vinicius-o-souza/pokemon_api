@@ -1,0 +1,23 @@
+uuid: 72671137-572e-4d93-ba40-048f79852087
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_pokemon_weight
+    - node.type.pokemon
+id: node.pokemon.field_pokemon_weight
+field_name: field_pokemon_weight
+entity_type: node
+bundle: pokemon
+label: Weight
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

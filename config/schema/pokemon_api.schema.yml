@@ -1,0 +1,8 @@
+# Schema for the configuration files of the Pokemon API module.
+pokemon_api.settings:
+  type: config_object
+  label: 'Pokemon API settings'
+  mapping:
+    pokemon_api_url:
+      type: url
+      label: 'Pokemon API Url'
