@@ -113,13 +113,13 @@ abstract class SyncEntity implements SyncEntityInterface {
     foreach ($fields as $field) {
       if ($field instanceof Translation) {
         if ($field->getValue(Translation::ES_LANGUAGE)) {
-          $entity->addTranslation('es', [
+          $entity->hasTranslation('es') ?: $entity->addTranslation('es', [
             'name' => $field->getValue(Translation::ES_LANGUAGE),
           ]);
         }
 
         if ($field->getValue(Translation::PT_BR_LANGUAGE)) {
-          $entity->addTranslation('pt-br', [
+          $entity->hasTranslation('pt-br') ?: $entity->addTranslation('pt-br', [
             'name' => $field->getValue(Translation::PT_BR_LANGUAGE),
           ]);
         }

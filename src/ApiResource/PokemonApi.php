@@ -25,16 +25,30 @@ class PokemonApi implements ApiResourceInterface {
    * {@inheritdoc}
    */
   public function getAllResources(): array {
-    $response = $this->pokeApi->getAllResources(Pokemon::getEndpoint());
+    $response = $this->pokeApi->getResourcesPagination(Pokemon::getEndpoint(), 20, 0);
 
     $pokemons = [];
-    foreach ($response as $resource) {
+    foreach ($response['results'] as $resource) {
       $pokemon = new Pokemon($resource['name'], $resource['url']);
-
       $pokemons[] = $pokemon;
     }
 
     return $pokemons;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getResourcesPagination(int $limit, int $offset): array {
+    $response = $this->pokeApi->getResourcesPagination(Pokemon::getEndpoint(), $limit, $offset);
+
+    $pokemon = [];
+    foreach ($response['results'] as $resource) {
+      $pokemon = new Pokemon($resource['name'], $resource['url']);
+      $pokemon[] = $pokemon;
+    }
+
+    return $pokemon;
   }
 
   /**

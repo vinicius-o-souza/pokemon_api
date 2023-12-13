@@ -53,7 +53,8 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
 
     if ($term) {
       $translatableFields = $this->getTranslatableFields($type);
-      $this->addTranslation($term, $translatableFields);
+      $term = $this->addTranslation($term, $translatableFields);
+      $term->save(); 
     }
   }
 
@@ -62,7 +63,7 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
    */
   private function getDataFields(Type $type): array {
     return [
-      'name' => strtoupper($type->getName()),
+      'name' => ucfirst($type->getName()),
       'vid' => 'pokemon_type',
       'field_pokeapi_id' => $type->getId(),
     ];

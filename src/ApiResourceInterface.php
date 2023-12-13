@@ -20,6 +20,21 @@ interface ApiResourceInterface {
   public function getAllResources(): array;
 
   /**
+   * Retrieves all resources from the PokeAPI.
+   * 
+   * @param int $limit
+   *   The limit.
+   * @param int $offset
+   *   The offset.
+   *
+   * @return \Drupal\pokemon_api\Resource\Resource[]
+   *   The resources.
+   *
+   * @throws \GuzzleHttp\Exception\GuzzleException
+   */
+  public function getResourcesPagination(int $limit, int $offset): array;
+
+  /**
    * Retrieves a resource from the PokeAPI.
    *
    * @param int $id
