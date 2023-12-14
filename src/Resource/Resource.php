@@ -22,6 +22,7 @@ abstract class Resource {
     protected string|null $url = NULL,
     protected int|null $id = NULL
   ) {
+    $this->name = ucfirst($name);
     if (!$id) {
       $this->id = self::extractIdFromUrl($url);
     }

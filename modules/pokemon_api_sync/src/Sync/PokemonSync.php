@@ -79,6 +79,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
           $node->addTranslation($language, [
             'title' => $pokemon->getName(),
           ]);
+          $node->save();
         }
         else {
           $translationNode = $node->getTranslation($language);
