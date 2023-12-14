@@ -3,6 +3,7 @@
 namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\pokemon_api_sync\Sync\PokemonSync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
@@ -12,6 +13,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Sync Pokemon Pokemon taxonomy.
  */
 final class PokemonSyncCommands extends DrushCommands {
+
+  use StringTranslationTrait;
 
   /**
    * Constructs a PokemonSyncCommands object.
@@ -52,7 +55,7 @@ final class PokemonSyncCommands extends DrushCommands {
 
       $connection->rollBack();
       if ($this->logger) {
-        $this->logger->error('Failed to synchronize pokemon pokemons: @message', ['@message' => $e->getMessage()]);
+        $this->logger->error($this->t('Failed to synchronize pokemon pokemons: @message', ['@message' => $e->getMessage()]));
       }
 
     }

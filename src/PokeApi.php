@@ -41,23 +41,12 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    * {@inheritdoc}
    */
   public function getAllResources(string $endpoint): array {
+    if (!$this->pokemonApiUrl) {
+      throw new \Exception('Pokemon API URL not set.');
+    }
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
       'limit' => self::LIMIT,
-    ]);
-    $response = json_decode($response->getBody()->getContents(), TRUE);
-
-    return $response['results'];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getResourcesPagination(string $endpoint, int $limit, int $offset): array {
-    $url = $this->pokemonApiUrl . $endpoint;
-    $response = $this->get($url, [], [
-      'limit' => $limit,
-      'offset' => $offset,
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
@@ -67,7 +56,27 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   /**
    * {@inheritdoc}
    */
+  public function getResourcesPagination(string $endpoint, int $limit, int $offset): array {
+    if (!$this->pokemonApiUrl) {
+      throw new \Exception('Pokemon API URL not set.');
+    }
+    $url = $this->pokemonApiUrl . $endpoint;
+    $response = $this->get($url, [], [
+      'limit' => $limit,
+      'offset' => $offset,
+    ]);
+    $response = json_decode($response->getBody()->getContents(), TRUE);
+
+    return $response['results'];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getResource(string $endpoint, int $id): array {
+    if (!$this->pokemonApiUrl) {
+      throw new \Exception('Pokemon API URL not set.');
+    }
     $url = $this->pokemonApiUrl . $endpoint . '/' . $id;
     $response = $this->get($url, [], []);
     $response = json_decode($response->getBody()->getContents(), TRUE);

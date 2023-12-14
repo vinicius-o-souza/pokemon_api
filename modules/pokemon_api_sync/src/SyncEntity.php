@@ -110,18 +110,26 @@ abstract class SyncEntity implements SyncEntityInterface {
    *   The content entity with added translations.
    */
   protected function addTranslation(ContentEntityBase $entity, array $fields): ContentEntityBase {
-    foreach ($fields as $field) {
+    foreach ($fields as $key => $field) {
       if ($field instanceof Translation) {
-        if ($field->getValue(Translation::ES_LANGUAGE)) {
-          $entity->addTranslation('es', [
-            'name' => $field->getValue(Translation::ES_LANGUAGE),
-          ]);
-        }
+        $languages = [
+          Translation::ES_LANGUAGE => 'es',
+          Translation::PT_BR_LANGUAGE => 'pt-br',
+        ];
 
-        if ($field->getValue(Translation::PT_BR_LANGUAGE)) {
-          $entity->addTranslation('pt-br', [
-            'name' => $field->getValue(Translation::PT_BR_LANGUAGE),
-          ]);
+        foreach ($languages as $pokeApiLanguage => $drupalLanguage) {
+          if ($field->getValue($pokeApiLanguage)) {
+            if (!$entity->hasTranslation($drupalLanguage)) {
+              $entity->addTranslation($drupalLanguage, [
+                $key => $field->getValue($pokeApiLanguage),
+              ]);
+            }
+            else {
+              $translationEntity = $entity->getTranslation($drupalLanguage);
+              $translationEntity->set($key, $field->getValue($pokeApiLanguage));
+              $translationEntity->save();
+            }
+          }
         }
       }
     }

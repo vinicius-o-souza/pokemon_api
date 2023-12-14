@@ -23,7 +23,7 @@ abstract class Resource {
     protected int|null $id = NULL
   ) {
     if (!$id) {
-      $this->id = $this->extractIdFromUrl($url);
+      $this->id = self::extractIdFromUrl($url);
     }
   }
 
@@ -65,7 +65,7 @@ abstract class Resource {
    *   The name.
    */
   public function setName(string $name): void {
-    $this->name = $name;
+    $this->name = ucfirst($name);
   }
 
   /**
@@ -117,7 +117,7 @@ abstract class Resource {
    * @return int
    *   The ID from the URL.
    */
-  protected function extractIdFromUrl(string $url): int {
+  public static function extractIdFromUrl(string $url): int {
     $parts = explode('/', $url);
     if (end($parts) === '') {
       array_pop($parts);
