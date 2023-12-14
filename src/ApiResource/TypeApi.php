@@ -43,7 +43,7 @@ class TypeApi implements ApiResourceInterface {
     $response = $this->pokeApi->getResourcesPagination(Type::getEndpoint(), $limit, $offset);
 
     $types = [];
-    foreach ($response['results'] as $resource) {
+    foreach ($response as $resource) {
       $type = new Type($resource['name'], $resource['url']);
       $types[] = $type;
     }

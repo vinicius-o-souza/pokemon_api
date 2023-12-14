@@ -65,7 +65,7 @@ abstract class Resource {
    *   The name.
    */
   public function setName(string $name): void {
-    $this->name = $name;
+    $this->name = ucfirst($name);
   }
 
   /**

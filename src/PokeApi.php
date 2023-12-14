@@ -50,7 +50,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return $response['results'];
+    return $response;
   }
 
   /**
@@ -67,7 +67,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return $response;
+    return $response['results'];
   }
 
   /**

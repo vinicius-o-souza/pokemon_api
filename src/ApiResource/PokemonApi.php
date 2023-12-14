@@ -25,10 +25,10 @@ class PokemonApi implements ApiResourceInterface {
    * {@inheritdoc}
    */
   public function getAllResources(): array {
-    $response = $this->pokeApi->getResourcesPagination(Pokemon::getEndpoint(), 20, 0);
+    $response = $this->pokeApi->getAllResources(Pokemon::getEndpoint());
 
     $pokemons = [];
-    foreach ($response['results'] as $resource) {
+    foreach ($response as $resource) {
       $pokemon = new Pokemon($resource['name'], $resource['url']);
       $pokemons[] = $pokemon;
     }
@@ -42,13 +42,13 @@ class PokemonApi implements ApiResourceInterface {
   public function getResourcesPagination(int $limit, int $offset): array {
     $response = $this->pokeApi->getResourcesPagination(Pokemon::getEndpoint(), $limit, $offset);
 
-    $pokemon = [];
+    $pokemons = [];
     foreach ($response['results'] as $resource) {
       $pokemon = new Pokemon($resource['name'], $resource['url']);
-      $pokemon[] = $pokemon;
+      $pokemons[] = $pokemon;
     }
 
-    return $pokemon;
+    return $pokemons;
   }
 
   /**
@@ -58,10 +58,10 @@ class PokemonApi implements ApiResourceInterface {
     $response = $this->pokeApi->getResource(Pokemon::getEndpoint(), $id);
 
     $pokemon = new Pokemon($response['name'], NULL, $response['id']);
-    $pokemon->setBaseExperience($response['base_experience']);
-    $pokemon->setHeight($response['height']);
-    $pokemon->setOrder($response['order']);
-    $pokemon->setWeight($response['weight']);
+    $pokemon->setBaseExperience($response['base_experience'] ?? 0);
+    $pokemon->setHeight($response['height'] ?? 0);
+    $pokemon->setOrder($response['order'] ?? 0);
+    $pokemon->setWeight($response['weight'] ?? 0);
     $pokemon->setAbilities($response['abilities']);
     $pokemon->setMoves($response['moves']);
     $pokemon->setSprites($response['sprites']);

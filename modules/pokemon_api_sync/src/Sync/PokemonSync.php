@@ -16,6 +16,14 @@ use Drupal\pokemon_api_sync\SyncNodeEntity;
 class PokemonSync extends SyncNodeEntity implements SyncInterface {
 
   /**
+   * Order maximum.
+   * 
+   * @var int
+   * 
+   */
+  private const ORDER_MAXIMUM = 10000;
+
+  /**
    * List of pokemon types api IDs.
    * 
    * @var array
@@ -37,7 +45,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    * {@inheritdoc}
    */
   public function syncAll(): void {
-    $pokemons = $this->pokemonApi->getAllResources();
+    $pokemons = $this->pokemonApi->getResourcesPagination(2000, 0);
 
     foreach ($pokemons as $pokemon) {
       $this->sync($pokemon);
@@ -61,13 +69,23 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     }
 
     if ($node) {
-      $node->hasTranslation('es') ?: $node->addTranslation('es', [
-        'title' => $pokemon->getName(),
-      ]);
-      $node->hasTranslation('pt-br') ?: $node->addTranslation('pt-br', [
-        'title' => $pokemon->getName(),
-      ]);
-      $node->save(); 
+      $languages = [
+        'es',
+        'pt-br',
+      ];
+
+      foreach ($languages as $language) {
+        if (!$node->hasTranslation($language)) {
+          $node->addTranslation($language, [
+            'title' => $pokemon->getName(),
+          ]);
+        }
+        else {
+          $translationNode = $node->getTranslation($language);
+          $translationNode->set('title', $pokemon->getName());
+          $translationNode->save();
+        }
+      }
     }
   }
 
@@ -76,6 +94,9 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    */
   private function getDataFields(Pokemon $pokemon): array {
     $types = $this->getPokemonTypesId($pokemon->getTypes());
+    if ($pokemon->getOrder() < 0) {
+      $pokemon->setOrder(self::ORDER_MAXIMUM + $pokemon->getOrder());
+    }
     return [
       'type' => 'pokemon',
       'title' => ucfirst($pokemon->getName()),
@@ -137,15 +158,6 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     }
 
     return $typeIds;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  private function getTranslatableFields(Pokemon $pokemon): array {
-    return [
-      'title' => ucfirst($pokemon->getName()),
-    ];
   }
 
 }

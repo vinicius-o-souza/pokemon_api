@@ -31,7 +31,7 @@ class Translation {
     $this->translations = [];
 
     foreach ($translations as $translation) {
-      $this->translations[$translation['language']['name']] = $translation['name'];
+      $this->translations[$translation['language']['name']] = ucfirst($translation['name']);
     }
   }
 
