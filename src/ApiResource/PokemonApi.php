@@ -43,7 +43,7 @@ class PokemonApi implements ApiResourceInterface {
     $response = $this->pokeApi->getResourcesPagination(Pokemon::getEndpoint(), $limit, $offset);
 
     $pokemons = [];
-    foreach ($response['results'] as $resource) {
+    foreach ($response as $resource) {
       $pokemon = new Pokemon($resource['name'], $resource['url']);
       $pokemons[] = $pokemon;
     }
