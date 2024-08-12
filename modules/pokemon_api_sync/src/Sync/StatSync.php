@@ -1,0 +1,81 @@
+<?php
+
+namespace Drupal\pokemon_api_sync\Sync;
+
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\pokemon_api\ApiResource\StatApi;
+use Drupal\pokemon_api\Resource\Resource;
+use Drupal\pokemon_api\Resource\Stat;
+use Drupal\pokemon_api_sync\SyncInterface;
+use Drupal\pokemon_api_sync\SyncTermEntity;
+
+/**
+ * Sync Pokemon Stat taxonomy.
+ */
+class StatSync extends SyncTermEntity implements SyncInterface {
+
+  /**
+   * Constructs a StatSync object.
+   */
+  public function __construct(
+    protected EntityTypeManagerInterface $entityTypeManager,
+    protected LoggerChannelInterface $logger,
+    private readonly StatApi $statApi
+  ) {}
+
+  /**
+   * {@inheritdoc}
+   */
+  public function syncAll(): void {
+    $stats = $this->statApi->getAllResources();
+
+    foreach ($stats as $stat) {
+      $this->sync($stat);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function sync(Resource $stat): void {
+    $stat = $this->statApi->getResource($stat->getId());
+
+    $term = $this->readEntity($stat->getId());
+    $data = $this->getDataFields($stat);
+
+    if ($term) {
+      $term = $this->updateEntity($term, $data);
+    }
+    else {
+      $term = $this->createEntity($data);
+    }
+
+    if ($term) {
+      $translatableFields = $this->getTranslatableFields($stat);
+      $term = $this->addTranslation($term, $translatableFields);
+      $term->save(); 
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  private function getDataFields(Stat $stat): array {
+    return [
+      'name' => ucfirst($stat->getName()),
+      'vid' => 'pokemon_stat',
+      'field_pokeapi_id' => $stat->getId(),
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  private function getTranslatableFields(Stat $stat): array {
+    return [
+      'name' => $stat->getNames(),
+    ];
+  }
+
+}

@@ -24,13 +24,6 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   private const ORDER_MAXIMUM = 10000;
 
   /**
-   * List of pokemon types api IDs.
-   * 
-   * @var array
-   */
-  protected array $pokemonTypesApiIds = [];
-
-  /**
    * Constructs a PokemonSync object.
    */
   public function __construct(
@@ -38,7 +31,6 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     protected LoggerChannelInterface $logger,
     private readonly PokemonApi $pokemonApi
   ) {
-    $this->pokemonTypesApiIds = $this->getPokemonTypesApiId();
   }
 
   /**
@@ -94,7 +86,10 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    * {@inheritdoc}
    */
   private function getDataFields(Pokemon $pokemon): array {
-    $types = $this->getPokemonTypesId($pokemon->getTypes());
+    // $abilities = $this->getPokemonTermsByApiIds('pokemon_ability', $pokemon->getAbilities());
+    $stats = $this->getPokemonTermsByApiIds('pokemon_stat', $pokemon->getStats());
+    $types = $this->getPokemonTermsByApiIds('pokemon_type', $pokemon->getTypes());
+
     if ($pokemon->getOrder() < 0) {
       $pokemon->setOrder(self::ORDER_MAXIMUM + $pokemon->getOrder());
     }
@@ -106,11 +101,11 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
       'field_pokemon_height' => $pokemon->getHeight(),
       'field_pokemon_order' => $pokemon->getOrder(),
       'field_pokemon_weight' => $pokemon->getWeight(),
-      // 'field_pokemon_abilities' => $pokemon->getAbilities(),
+      // 'field_pokemon_abilities' => $abilities,
       // 'field_pokemon_moves' => $pokemon->getMoves(),
       // 'field_pokemon_sprites' => $pokemon->getSprites(),
       // 'field_pokemon_species' => $pokemon->getSpecies(),
-      // 'field_pokemon_stats' => $pokemon->getStats(),
+      'field_pokemon_stats' => $stats,
       'field_pokemon_types' => $types,
     ];
   }
@@ -118,47 +113,25 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   /**
    * Get array of pokemon api IDs.
    * 
+   * @param string $vid
+   *   The vid.
+   * 
    * @return array
    *   List of pokemon types api IDs.
    */
-  private function getPokemonTypesApiId(): array {
+  private function getPokemonTermsByApiIds(string $vid, array $pokemonApiIds): array {
     $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
-      'vid' => 'pokemon_type',
+      'vid' => $vid,
     ]);
 
-    $pokemonTypesApiIds = [];
+    $pokemonTerms = [];
     foreach ($terms as $term) {
-      $pokemonTypesApiIds[$term->id()] = $term->get('field_pokeapi_id')->getString();
-    }
-
-    return $pokemonTypesApiIds;
-  }
-
-  
-  /**
-   * Get list of pokemon types term IDs.
-   *
-   * @param array $types
-   *   An array of Pokemon type terms from the PokeAPI.
-   * 
-   * @return array
-   *   An array of Pokemon type term IDs.
-   */
-  private function getPokemonTypesId(array $types): array {
-    $pokeApiIds = array_map(function ($type) {
-      $url = $type['type']['url'];
-      return Resource::extractIdFromUrl($url);
-    }, $types);
-
-    $typeIds = [];
-    foreach ($this->pokemonTypesApiIds as $termId => $pokemonApiId) {
-      $key = array_search($pokemonApiId, $pokeApiIds);
-      if ($key !== false) {
-        $typeIds[] = $termId;
+      if (in_array($term->get('field_pokeapi_id')->getString(), $pokemonApiIds)) {
+        $pokemonTerms[] = $term->id();
       }
     }
 
-    return $typeIds;
+    return $pokemonTerms;
   }
 
 }
