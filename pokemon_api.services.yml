@@ -11,6 +11,11 @@ services:
     arguments: ['@pokemon_api.poke_api']
     tags:
       - { name: service }
+  pokemon_api.stat_api:
+    class: Drupal\pokemon_api\ApiResource\StatApi
+    arguments: ['@pokemon_api.poke_api']
+    tags:
+      - { name: service }
   pokemon_api.type_api:
     class: Drupal\pokemon_api\ApiResource\TypeApi
     arguments: ['@pokemon_api.poke_api']

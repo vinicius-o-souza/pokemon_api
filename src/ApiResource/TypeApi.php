@@ -58,9 +58,7 @@ class TypeApi implements ApiResourceInterface {
     $response = $this->pokeApi->getResource(Type::getEndpoint(), $id);
 
     $type = new Type($response['name'], NULL, $response['id']);
-    $type->setMoves($response['moves']);
     $type->setNames($response['names']);
-    $type->setPokemon($response['pokemon']);
 
     return $type;
   }

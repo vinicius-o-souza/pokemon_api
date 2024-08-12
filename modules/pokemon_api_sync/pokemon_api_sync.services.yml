@@ -9,6 +9,11 @@ services:
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.pokemon_api']
     tags:
       - { name: service }
+  pokemon_api_sync.stat_sync:
+    class: \Drupal\pokemon_api_sync\Sync\StatSync
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.type_api']
+    tags:
+      - { name: service }
   pokemon_api_sync.type_sync:
     class: \Drupal\pokemon_api_sync\Sync\TypeSync
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.type_api']

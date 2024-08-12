@@ -1,0 +1,32 @@
+uuid: ae40a75b-ddbc-41b4-afd3-efad9021cc39
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.pokemon_ability.field_pokeapi_id
+    - taxonomy.vocabulary.pokemon_ability
+  module:
+    - text
+id: taxonomy_term.pokemon_ability.default
+targetEntityType: taxonomy_term
+bundle: pokemon_ability
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_pokeapi_id:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  langcode: true
