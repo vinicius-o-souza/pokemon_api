@@ -5,8 +5,7 @@ namespace Drupal\pokemon_api\Resource;
 /**
  * Abtract Resource class to get from Pokemon API.
  */
-abstract class Resource {
-
+abstract class Resource implements ResourceInterface {
   /**
    * Constructs a Resource object.
    *
@@ -37,73 +36,49 @@ abstract class Resource {
   abstract public static function getEndpoint(): string;
 
   /**
-   * Get the field.
-   *
-   * @param string $field
-   *   The field.
-   *
-   * @return mixed
-   *   The field value.
+   * {@inheritdoc}
    */
   public function get(string $field): mixed {
     return $this->$field;
   }
 
   /**
-   * Get the name.
-   *
-   * @return string
-   *   The name.
+   * {@inheritdoc}
    */
   public function getName(): string {
     return $this->name;
   }
 
   /**
-   * Set the name.
-   *
-   * @param string $name
-   *   The name.
+   * {@inheritdoc}
    */
   public function setName(string $name): void {
     $this->name = ucfirst($name);
   }
 
   /**
-   * Get the id.
-   *
-   * @return int
-   *   The id.
+   * {@inheritdoc}
    */
   public function getId(): int {
     return $this->id;
   }
 
   /**
-   * Set the id.
-   *
-   * @param int $id
-   *   The id.
+   * {@inheritdoc}
    */
   public function setId(int $id): void {
     $this->id = $id;
   }
 
   /**
-   * Get the url.
-   *
-   * @return string
-   *   The url.
+   * {@inheritdoc}
    */
   public function getUrl(): string {
     return $this->url;
   }
 
   /**
-   * Set the url.
-   *
-   * @param string $url
-   *   The url.
+   * {@inheritdoc}
    */
   public function setUrl(string $url): void {
     $this->url = $url;

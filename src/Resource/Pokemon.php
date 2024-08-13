@@ -2,8 +2,6 @@
 
 namespace Drupal\pokemon_api\Resource;
 
-use Drupal\pokemon_api\Translation;
-
 /**
  * Resource Pokemon class.
  */
@@ -273,7 +271,11 @@ class Pokemon extends Resource {
    *   The stats.
    */
   public function setStats(array $stats): void {
-    $this->stats = $stats;
+    $pokemonStats = [];
+    foreach ($stats as $stat) {
+      $pokemonStats[self::extractIdFromUrl($stat['stat']['url'])] = $stat['base_stat'];
+    }
+    $this->stats = $pokemonStats;
   }
 
   /**
@@ -293,7 +295,10 @@ class Pokemon extends Resource {
    *   The types.
    */
   public function setTypes(array $types): void {
-    $this->types = $types;
+    foreach ($types as $type) {
+      $pokemonTypes[self::extractIdFromUrl($type['type']['url'])] = $type['type']['name'];
+    }
+    $this->types = $pokemonTypes;
   }
 
 }
