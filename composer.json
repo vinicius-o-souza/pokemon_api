@@ -14,7 +14,7 @@
   "autoload": {
     "psr-4": {
       "Drupal\\pokemon_api": "src/",
-      "Drupal\\pokemon_api_sync": "src/"
+      "Drupal\\pokemon_api_sync": "modules/pokemon_api_sync/"
     }
   }
 }
