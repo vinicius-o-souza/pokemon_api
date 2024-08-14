@@ -45,8 +45,9 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    * {@inheritdoc}
    */
   public function getAllResources(string $resourceClass): ResponseResourceIterator {
-    $resource = $this->getResourceClass($resourceClass);
-    $endpoint = $resource->getEndpoint();
+    $this->validateResourceClass($resourceClass);
+
+    $endpoint = $resourceClass::getEndpoint();
 
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
@@ -61,8 +62,8 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    * {@inheritdoc}
    */
   public function getResourcesPagination(string $resourceClass, int $limit, int $offset): ResponseResourceIterator {
-    $resource = $this->getResourceClass($resourceClass);
-    $endpoint = $resource->getEndpoint();
+    $this->validateResourceClass($resourceClass);
+    $endpoint = $resourceClass::getEndpoint();
 
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
@@ -78,14 +79,14 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    * {@inheritdoc}
    */
   public function getResource(string $resourceClass, int $id): ResourceInterface {
-    $resource = $this->getResourceClass($resourceClass);
-    $endpoint = $resource->getEndpoint();
+    $this->validateResourceClass($resourceClass);
+    $endpoint = $resourceClass::getEndpoint();
 
     $url = $this->pokemonApiUrl . $endpoint . '/' . $id;
     $response = $this->get($url, [], []);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    $resource = $resource->createFromArray($response);
+    $resource = $resourceClass::createFromArray($response);
 
     return $resource;
   }
@@ -98,20 +99,15 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    *
    * @throws \Exception
    *   If resource does not exist or does not implement ResourceInterface.
-   *
-   * @return \Drupal\pokemon_api\Resource\ResourceInterface
-   *   The validated resource class instance.
    */
-  private function getResourceClass(string $resourceClass): ResourceInterface {
+  private function validateResourceClass(string $resourceClass): void {
     if (!class_exists($resourceClass)) {
       throw new \Exception('Resource class not found.');
     }
-    $resource = new $resourceClass();
-    if (!$resource instanceof ResourceInterface) {
+
+    if (!is_subclass_of($resourceClass, ResourceInterface::class)) {
       throw new \Exception('Resource class must implement ResourceInterface.');
     }
-
-    return $resource;
   }
 
 }

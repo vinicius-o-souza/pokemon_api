@@ -27,8 +27,8 @@ class Type extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public function createFromArray(array $data): Type {
-    $type = new Type($data['name'], $data['url']);
+  public static function createFromArray(array $data): Type {
+    $type = new Type($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
     $type->setNames($data['names'] ?? []);
 
     return $type;

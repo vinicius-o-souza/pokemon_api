@@ -56,6 +56,9 @@ final class PokemonSyncCommands extends DrushCommands {
       $connection->rollBack();
       if ($this->logger) {
         $this->logger->error($this->t('Failed to synchronize pokemon pokemons: @message', ['@message' => $e->getMessage()]));
+        $this->logger->error($this->t('Stack trace: @stack_trace', [
+          '@stack_trace' => $e->getTraceAsString(),
+        ]));
       }
 
     }

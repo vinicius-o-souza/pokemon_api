@@ -97,8 +97,8 @@ class Pokemon extends Resource {
   /**
    * {@inheritdoc}
    */
-  public function createFromArray(array $data): Pokemon {
-    $pokemon = new Pokemon($data['name'], $data['url']);
+  public static function createFromArray(array $data): Pokemon {
+    $pokemon = new Pokemon($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
     $pokemon->setBaseExperience($data['base_experience'] ?? 0);
     $pokemon->setHeight($data['height'] ?? 0);
     $pokemon->setOrder($data['order'] ?? 0);

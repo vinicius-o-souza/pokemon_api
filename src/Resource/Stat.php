@@ -34,8 +34,8 @@ class Stat extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public function createFromArray(array $data): Stat {
-    $stat = new Stat($data['name'], $data['url']);
+  public static function createFromArray(array $data): Stat {
+    $stat = new Stat($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
     $stat->setNames($data['names'] ?? []);
     $stat->setBaseStat($data['base_stat'] ?? 0);
 
