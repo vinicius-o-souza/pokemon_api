@@ -27,7 +27,7 @@ class Move extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public function createFromArray(array $data): Move {
+  public static function createFromArray(array $data): Move {
     $move = new Move($data['name'], $data['url']);
     $move->setNames($data['names'] ?? []);
 

@@ -36,8 +36,8 @@ class Ability extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public function createFromArray(array $data): Ability {
-    $ability = new Ability($data['name'], $data['url']);
+  public static function createFromArray(array $data): Ability {
+    $ability = new Ability($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
     $ability->setNames($data['names'] ?? []);
     $ability->setEffectEntries($data['effect_entries'] ?? []);
 

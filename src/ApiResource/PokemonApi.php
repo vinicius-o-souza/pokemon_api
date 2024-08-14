@@ -2,6 +2,7 @@
 
 namespace Drupal\pokemon_api\ApiResource;
 
+use Drupal\pokemon_api\ApiResource;
 use Drupal\pokemon_api\Resource\Pokemon;
 
 /**

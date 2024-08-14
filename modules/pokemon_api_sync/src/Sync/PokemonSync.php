@@ -206,13 +206,13 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   private function getOrCreateStatParagaphs(array $pokemonStats, ?ContentEntityBase $node): array {
     $stats = [];
     if ($node) {
+      /** @var \Drupal\paragraphs\Entity\Paragraph[] $paragraphs */
       $paragraphs = $node->get('field_pokemon_stats')->referencedEntities();
       foreach ($paragraphs as $paragraph) {
         $statTerm = $paragraph->get('field_pokemon_stat')->entity;
         if ($statTerm) {
           $statPokeApiId = $statTerm->get('field_pokeapi_id')->value;
           if ($statPokeApiId) {
-            $paragraph->set('field_pokemon_stat', $this->taxonomyTerms['pokemon_stat'][$statPokeApiId]);
             $paragraph->set('field_pokemon_base_stat', $pokemonStats[$statPokeApiId]);
             $paragraph->save();
 
@@ -230,7 +230,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
       if ($this->taxonomyTerms['pokemon_stat'][$key]) {
         /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
         $paragraph = $this->entityTypeManager->getStorage('paragraph')->create([
-          'type' => 'pokemon_stat',
+          'type' => 'pokemon_stats',
           'field_pokemon_stat' => $this->taxonomyTerms['pokemon_stat'][$key],
           'field_pokemon_base_stat' => $stat,
         ]);

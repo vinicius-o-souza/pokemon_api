@@ -56,6 +56,9 @@ final class AbilitySyncCommands extends DrushCommands {
       $connection->rollBack();
       if ($this->logger) {
         $this->logger->error($this->t('Failed to synchronize pokemon abilities: @message', ['@message' => $e->getMessage()]));
+        $this->logger->error($this->t('Stack trace: @stack_trace', [
+          '@stack_trace' => $e->getTraceAsString(),
+        ]));
       }
 
     }

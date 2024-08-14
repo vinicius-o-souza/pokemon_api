@@ -24,7 +24,7 @@ interface ResourceInterface {
    * @return ResourceInterface
    *   The resource.
    */
-  public function createFromArray(array $data): ResourceInterface;
+  public static function createFromArray(array $data): ResourceInterface;
 
   /**
    * Get the field.
