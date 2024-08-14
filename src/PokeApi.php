@@ -3,6 +3,7 @@
 namespace Drupal\pokemon_api;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\pokemon_api\Resource\ResourceInterface;
 use GuzzleHttp\ClientInterface;
 
 /**
@@ -35,31 +36,34 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   public function __construct(ClientInterface $client, ConfigFactoryInterface $config) {
     parent::__construct($client);
     $this->pokemonApiUrl = trim($config->get('pokemon_api.settings')->get('pokemon_api_url'));
+    if (!$this->pokemonApiUrl) {
+      throw new \Exception('Pokemon API URL not set.');
+    }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getAllResources(string $endpoint): array {
-    if (!$this->pokemonApiUrl) {
-      throw new \Exception('Pokemon API URL not set.');
-    }
+  public function getAllResources(string $resourceClass): ResponseResourceIterator {
+    $resource = $this->getResourceClass($resourceClass);
+    $endpoint = $resource->getEndpoint();
+
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
       'limit' => self::LIMIT,
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return $response['results'];
+    return new ResponseResourceIterator($response, $resourceClass);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getResourcesPagination(string $endpoint, int $limit, int $offset): array {
-    if (!$this->pokemonApiUrl) {
-      throw new \Exception('Pokemon API URL not set.');
-    }
+  public function getResourcesPagination(string $resourceClass, int $limit, int $offset): ResponseResourceIterator {
+    $resource = $this->getResourceClass($resourceClass);
+    $endpoint = $resource->getEndpoint();
+
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
       'limit' => $limit,
@@ -67,21 +71,47 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return $response['results'];
+    return new ResponseResourceIterator($response, $resourceClass);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getResource(string $endpoint, int $id): array {
-    if (!$this->pokemonApiUrl) {
-      throw new \Exception('Pokemon API URL not set.');
-    }
+  public function getResource(string $resourceClass, int $id): ResourceInterface {
+    $resource = $this->getResourceClass($resourceClass);
+    $endpoint = $resource->getEndpoint();
+
     $url = $this->pokemonApiUrl . $endpoint . '/' . $id;
     $response = $this->get($url, [], []);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return $response;
+    $resource = $resource->createFromArray($response);
+
+    return $resource;
+  }
+
+  /**
+   * Retrieves and validates a resource class.
+   *
+   * @param string $resourceClass
+   *   The name of the resource class.
+   *
+   * @throws \Exception
+   *   If resource does not exist or does not implement ResourceInterface.
+   *
+   * @return \Drupal\pokemon_api\Resource\ResourceInterface
+   *   The validated resource class instance.
+   */
+  private function getResourceClass(string $resourceClass): ResourceInterface {
+    if (!class_exists($resourceClass)) {
+      throw new \Exception('Resource class not found.');
+    }
+    $resource = new $resourceClass();
+    if (!$resource instanceof ResourceInterface) {
+      throw new \Exception('Resource class must implement ResourceInterface.');
+    }
+
+    return $resource;
   }
 
 }

@@ -2,8 +2,6 @@
 
 namespace Drupal\pokemon_api\Resource;
 
-use Drupal\pokemon_api\Translation;
-
 /**
  * Resource Pokemon class.
  */
@@ -15,73 +13,73 @@ class Pokemon extends Resource {
    * @var string
    */
   private const ENDPOINT = 'pokemon';
-  
+
   /**
    * The base experience gained for defeating this Pokémon.
-   * 
+   *
    * @var int
    */
   private int $baseExperience;
-  
+
   /**
    * The height of this Pokémon in decimetres.
-   * 
+   *
    * @var int
    */
   private int $height;
 
   /**
-   * Order for sorting. Almost national order, except families are grouped together.
-   * 
+   * Order for sorting. Almost national order.
+   *
    * @var int
    */
   private int $order;
-  
+
   /**
    * The weight of this Pokémon in hectograms.
-   * 
+   *
    * @var int
    */
   private int $weight;
-  
+
   /**
    * A list of abilities this Pokémon could potentially have.
-   * 
+   *
    * @var array
    */
   private array $abilities;
-  
+
   /**
-   * A list of moves along with learn methods and level details pertaining to specific version groups.
-   * 
+   * A list of moves along with learn methods and level details pertaining.
+   *
    * @var array
    */
   private array $moves;
-  
+
   /**
-   * A set of sprites used to depict this Pokémon in the game. A visual representation of the various sprites can be found at PokeAPI/sprites
-   * 
+   * A set of sprites used to depict this Pokémon in the game.
+   *
    * @var array
    */
   private array $sprites;
-  
+
   /**
    * The species this Pokémon belongs to.
-   * 
+   *
    * @var array
    */
   private array $species;
-  
+
   /**
    * A list of base stat values for this Pokémon.
-   * 
+   *
    * @var array
    */
   private array $stats;
-  
+
   /**
    * A list of details showing types this Pokémon has.
-   * 
+   *
    * @var array
    */
   private array $types;
@@ -94,6 +92,25 @@ class Pokemon extends Resource {
    */
   public static function getEndpoint(): string {
     return self::ENDPOINT;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function createFromArray(array $data): Pokemon {
+    $pokemon = new Pokemon($data['name'], $data['url']);
+    $pokemon->setBaseExperience($data['base_experience'] ?? 0);
+    $pokemon->setHeight($data['height'] ?? 0);
+    $pokemon->setOrder($data['order'] ?? 0);
+    $pokemon->setWeight($data['weight'] ?? 0);
+    $pokemon->setAbilities($data['abilities'] ?? []);
+    $pokemon->setMoves($data['moves'] ?? []);
+    $pokemon->setSprites($data['sprites'] ?? []);
+    $pokemon->setSpecies($data['species'] ?? []);
+    $pokemon->setStats($data['stats'] ?? []);
+    $pokemon->setTypes($data['types'] ?? []);
+
+    return $pokemon;
   }
 
   /**
@@ -137,20 +154,20 @@ class Pokemon extends Resource {
   }
 
   /**
-   * Get the order for sorting. Almost national order, except families are grouped together.
+   * Get the order for sorting. Almost national order.
    *
    * @return int
-   *   The order for sorting. Almost national order, except families are grouped together.
+   *   The order for sorting. Almost national order.
    */
   public function getOrder(): int {
     return $this->order;
   }
 
   /**
-   * Set the order for sorting. Almost national order, except families are grouped together.
+   * Set the order for sorting. Almost national order.
    *
    * @param int $order
-   *   The order for sorting. Almost national order, except families are grouped together.
+   *   The order for sorting. Almost national order.
    */
   public function setOrder(int $order): void {
     $this->order = $order;
@@ -273,7 +290,11 @@ class Pokemon extends Resource {
    *   The stats.
    */
   public function setStats(array $stats): void {
-    $this->stats = $stats;
+    $pokemonStats = [];
+    foreach ($stats as $stat) {
+      $pokemonStats[self::extractIdFromUrl($stat['stat']['url'])] = $stat['base_stat'];
+    }
+    $this->stats = $pokemonStats;
   }
 
   /**
@@ -293,7 +314,11 @@ class Pokemon extends Resource {
    *   The types.
    */
   public function setTypes(array $types): void {
-    $this->types = $types;
+    $pokemonTypes = [];
+    foreach ($types as $type) {
+      $pokemonTypes[self::extractIdFromUrl($type['type']['url'])] = $type['type']['name'];
+    }
+    $this->types = $pokemonTypes;
   }
 
 }

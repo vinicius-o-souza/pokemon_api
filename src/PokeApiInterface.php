@@ -2,6 +2,8 @@
 
 namespace Drupal\pokemon_api;
 
+use Drupal\pokemon_api\Resource\ResourceInterface;
+
 /**
  * Interface for PokeApiInterface.
  */
@@ -10,46 +12,46 @@ interface PokeApiInterface {
   /**
    * Retrieves all resources from the PokeAPI.
    *
-   * @param string $endpoint
-   *   The endpoint string.
+   * @param string $resourceClass
+   *   The resource string class.
    *
-   * @return array
-   *   The response from the API.
+   * @return \Drupal\pokemon_api\ResponseResourceIterator
+   *   The resource iterator.
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function getAllResources(string $endpoint): array;
+  public function getAllResources(string $resourceClass): ResponseResourceIterator;
 
   /**
    * Retrieves all resources from the PokeAPI.
    *
-   * @param string $endpoint
-   *   The endpoint string.
+   * @param string $resourceClass
+   *   The resource string class.
    * @param int $limit
    *   Limit the number of items.
    * @param int $offset
    *   Offset the items.
    *
-   * @return array
-   *   The response from the API.
+   * @return \Drupal\pokemon_api\ResponseResourceIterator
+   *   The resource iterator.
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function getResourcesPagination(string $endpoint, int $limit, int $offset): array;
+  public function getResourcesPagination(string $resourceClass, int $limit, int $offset): ResponseResourceIterator;
 
   /**
    * Retrieves a resource from the PokeAPI.
    *
-   * @param string $endpoint
-   *   The endpoint string.
+   * @param string $resourceClass
+   *   The resource string class.
    * @param int $id
    *   The id of the resource.
    *
-   * @return array
-   *   The response from the API.
+   * @return \Drupal\pokemon_api\Resource\ResourceInterface
+   *   The resource.
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function getResource(string $endpoint, int $id): array;
+  public function getResource(string $resourceClass, int $id): ResourceInterface;
 
 }

@@ -21,7 +21,7 @@ final class TypeSyncCommands extends DrushCommands {
    */
   public function __construct(
     private readonly Connection $database,
-    private readonly TypeSync $typeSync
+    private readonly TypeSync $typeSync,
   ) {
     parent::__construct();
   }

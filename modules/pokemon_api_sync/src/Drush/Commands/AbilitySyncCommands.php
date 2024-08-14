@@ -4,24 +4,24 @@ namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\pokemon_api_sync\Sync\StatSync;
+use Drupal\pokemon_api_sync\Sync\AbilitySync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sync Pokemon Stat taxonomy.
+ * Sync Pokemon Ability taxonomy.
  */
-final class StatSyncCommands extends DrushCommands {
+final class AbilitySyncCommands extends DrushCommands {
 
   use StringTranslationTrait;
 
   /**
-   * Constructs a StatSyncCommands object.
+   * Constructs a AbilitySyncCommands object.
    */
   public function __construct(
     private readonly Connection $database,
-    private readonly StatSync $statSync,
+    private readonly AbilitySync $abilitySync,
   ) {
     parent::__construct();
   }
@@ -32,30 +32,30 @@ final class StatSyncCommands extends DrushCommands {
   public static function create(ContainerInterface $container): self {
     return new static(
       $container->get('database'),
-      $container->get('pokemon_api_sync.stat_sync'),
+      $container->get('pokemon_api_sync.ability_sync'),
     );
   }
 
   /**
-   * Command to synchronize pokemon Stats.
+   * Command to synchronize pokemon abilities.
    */
-  #[CLI\Command(name: 'pokemon_api_sync:sync-stat', aliases: ['sync-stat'])]
-  #[CLI\Usage(name: 'pokemon_api_sync:sync-stat', description: 'Usage description')]
-  public function syncStat(): void {
+  #[CLI\Command(name: 'pokemon_api_sync:sync-ability', aliases: ['sync-ability'])]
+  #[CLI\Usage(name: 'pokemon_api_sync:sync-ability', description: 'Usage description')]
+  public function syncAbility(): void {
 
     $connection = $this->database->startTransaction();
     try {
 
-      $this->statSync->syncAll();
+      $this->abilitySync->syncAll();
       if ($this->logger) {
-        $this->logger->info('Pokemon Stats synchronization successfully');
+        $this->logger->info('Pokemon abilities synchronization successfully');
       }
     }
     catch (\Exception $e) {
 
       $connection->rollBack();
       if ($this->logger) {
-        $this->logger->error($this->t('Failed to synchronize pokemon stats: @message', ['@message' => $e->getMessage()]));
+        $this->logger->error($this->t('Failed to synchronize pokemon abilities: @message', ['@message' => $e->getMessage()]));
       }
 
     }

@@ -9,6 +9,23 @@
   "prefer-stable": true,
   "require": {
     "php": ">=8.1",
-    "drupal/core": "^10.0"
+    "drupal/core": "^10.0",
+    "drush/drush": " ^11 | ^12 | ^13"
+  },
+  "autoload": {
+    "psr-4": {
+      "Drupal\\pokemon_api\\": "src/",
+      "Drupal\\pokemon_api_sync\\": "modules/pokemon_api_sync/"
+    }
+  },
+  "require-dev": {
+    "phpstan/phpstan": "*",
+    "phpmetrics/phpmetrics": "^2.8",
+    "drupal/coder": "^8.3"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
   }
 }

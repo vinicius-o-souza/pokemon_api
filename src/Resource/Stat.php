@@ -2,19 +2,10 @@
 
 namespace Drupal\pokemon_api\Resource;
 
-use Drupal\pokemon_api\Translation;
-
 /**
  * Resource Stat class.
  */
-class Stat extends Resource {
-
-  /**
-   * The names.
-   *
-   * @var \Drupal\pokemon_api\Translation|null
-   */
-  private Translation|null $names;
+class Stat extends TranslatableResource {
 
   /**
    * The endpoint.
@@ -22,6 +13,13 @@ class Stat extends Resource {
    * @var string
    */
   private const ENDPOINT = 'stat';
+
+  /**
+   * The base stat.
+   *
+   * @var int
+   */
+  private int $baseStat;
 
   /**
    * Get the endpoint.
@@ -34,23 +32,34 @@ class Stat extends Resource {
   }
 
   /**
-   * Get the names.
-   *
-   * @return \Drupal\pokemon_api\Translation|null
-   *   The names.
+   * {@inheritdoc}
    */
-  public function getNames(): ?Translation {
-    return $this->names;
+  public function createFromArray(array $data): Stat {
+    $stat = new Stat($data['name'], $data['url']);
+    $stat->setNames($data['names'] ?? []);
+    $stat->setBaseStat($data['base_stat'] ?? 0);
+
+    return $stat;
   }
 
   /**
-   * Set the names.
+   * Get the base stat gained for defeating this Pokemon.
    *
-   * @param array $names
-   *   The names.
+   * @return int
+   *   The base stat gained for defeating this Pokemon.
    */
-  public function setNames(array $names) {
-    $this->names = new Translation($names);
+  public function getBaseStat(): int {
+    return $this->baseStat;
+  }
+
+  /**
+   * Set the base stat gained for defeating this Pokemon.
+   *
+   * @param int $baseStat
+   *   The base stat gained for defeating this Pokemon.
+   */
+  public function setBaseStat(int $baseStat): void {
+    $this->baseStat = $baseStat;
   }
 
 }

@@ -3,16 +3,16 @@
 namespace Drupal\pokemon_api\Resource;
 
 /**
- * Resource Type class.
+ * Resource Move class.
  */
-class Type extends TranslatableResource {
+class Move extends TranslatableResource {
 
   /**
    * The endpoint.
    *
    * @var string
    */
-  private const ENDPOINT = 'type';
+  private const ENDPOINT = 'move';
 
   /**
    * Get the endpoint.
@@ -27,11 +27,11 @@ class Type extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public function createFromArray(array $data): Type {
-    $type = new Type($data['name'], $data['url']);
-    $type->setNames($data['names'] ?? []);
+  public function createFromArray(array $data): Move {
+    $move = new Move($data['name'], $data['url']);
+    $move->setNames($data['names'] ?? []);
 
-    return $type;
+    return $move;
   }
 
 }

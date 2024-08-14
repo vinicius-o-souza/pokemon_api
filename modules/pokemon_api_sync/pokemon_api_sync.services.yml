@@ -4,6 +4,11 @@ services:
     arguments: ['pokemon_api_sync']
 
   # Sync Services
+  pokemon_api_sync.ability_sync:
+    class: \Drupal\pokemon_api_sync\Sync\AbilitySync
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.ability_api']
+    tags:
+      - { name: service }
   pokemon_api_sync.pokemon_sync:
     class: \Drupal\pokemon_api_sync\Sync\PokemonSync
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.pokemon_api']
@@ -11,7 +16,7 @@ services:
       - { name: service }
   pokemon_api_sync.stat_sync:
     class: \Drupal\pokemon_api_sync\Sync\StatSync
-    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.type_api']
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.stat_api']
     tags:
       - { name: service }
   pokemon_api_sync.type_sync:

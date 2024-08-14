@@ -4,45 +4,45 @@ namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
-use Drupal\pokemon_api\ApiResource\TypeApi;
+use Drupal\pokemon_api\ApiResource\AbilityApi;
+use Drupal\pokemon_api\Resource\Ability;
 use Drupal\pokemon_api\Resource\ResourceInterface;
-use Drupal\pokemon_api\Resource\Type;
 use Drupal\pokemon_api_sync\SyncInterface;
 use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
- * Sync Pokemon Type taxonomy.
+ * Sync Pokemon Ability taxonomy.
  */
-class TypeSync extends SyncTermEntity implements SyncInterface {
+class AbilitySync extends SyncTermEntity implements SyncInterface {
 
   /**
-   * Constructs a TypeSync object.
+   * Constructs a AbilitySync object.
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected LoggerChannelInterface $logger,
-    private readonly TypeApi $typeApi,
+    private readonly AbilityApi $abilityApi,
   ) {}
 
   /**
    * {@inheritdoc}
    */
   public function syncAll(): void {
-    $types = $this->typeApi->getAllResources();
+    $abilities = $this->abilityApi->getAllResources();
 
-    foreach ($types as $type) {
-      $this->sync($type);
+    foreach ($abilities as $ability) {
+      $this->sync($ability);
     }
   }
 
   /**
    * {@inheritdoc}
    */
-  public function sync(ResourceInterface $type): void {
-    $type = $this->typeApi->getResource($type->getId());
+  public function sync(ResourceInterface $ability): void {
+    $ability = $this->abilityApi->getResource($ability->getId());
 
-    $term = $this->readEntity($type->getId());
-    $data = $this->getDataFields($type);
+    $term = $this->readEntity($ability->getId());
+    $data = $this->getDataFields($ability);
 
     if ($term) {
       $term = $this->updateEntity($term, $data);
@@ -51,8 +51,8 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
       $term = $this->createEntity($data);
     }
 
-    if ($term && $type instanceof Type) {
-      $translatableFields = $this->getTranslatableFields($type);
+    if ($term && $ability instanceof Ability) {
+      $translatableFields = $this->getTranslatableFields($ability);
       $term = $this->addTranslation($term, $translatableFields);
       $term->save();
     }
@@ -62,15 +62,16 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
    * {@inheritdoc}
    */
   public function getVid(): string {
-    return 'pokemon_type';
+    return 'pokemon_ability';
   }
 
   /**
    * {@inheritdoc}
    */
-  private function getTranslatableFields(Type $type): array {
+  private function getTranslatableFields(Ability $ability): array {
     return [
-      'name' => $type->getNames(),
+      'name' => $ability->getNames(),
+      'body' => $ability->getEffectEntries(),
     ];
   }
 
