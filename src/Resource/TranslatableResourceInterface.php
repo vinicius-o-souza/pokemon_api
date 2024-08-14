@@ -4,6 +4,9 @@ namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Translation;
 
+/**
+ * Interface TranslatableResourceInterface for TranslatableResource.
+ */
 interface TranslatableResourceInterface {
 
   /**
@@ -20,6 +23,6 @@ interface TranslatableResourceInterface {
    * @param array $names
    *   The names.
    */
-  public function setNames(array $names);
-  
+  public function setNames(array $names): void;
+
 }

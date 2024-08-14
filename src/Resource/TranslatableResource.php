@@ -26,7 +26,7 @@ abstract class TranslatableResource extends Resource implements TranslatableReso
   /**
    * {@inheritdoc}
    */
-  public function setNames(array $names) {
+  public function setNames(array $names): void {
     $this->names = new Translation($names);
   }
 

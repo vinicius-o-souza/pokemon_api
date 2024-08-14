@@ -6,6 +6,11 @@ services:
       - { name: service }
 
   # API Resources
+  pokemon_api.ability_api:
+    class: Drupal\pokemon_api\ApiResource\AbilityApi
+    arguments: ['@pokemon_api.poke_api']
+    tags:
+      - { name: service }
   pokemon_api.pokemon_api:
     class: Drupal\pokemon_api\ApiResource\PokemonApi
     arguments: ['@pokemon_api.poke_api']

@@ -13,5 +13,12 @@ use Symfony\Component\Validator\Constraint;
  * )
  */
 class StatParagraphLimitConstraint extends Constraint {
-  public $message = 'Only one paragraph with the taxonomy term "@term" is allowed.';
+
+  /**
+   * Message for constraint violation.
+   *
+   * @var string
+   */
+  public string $message = 'Only one paragraph with the taxonomy term "@term" is allowed.';
+
 }

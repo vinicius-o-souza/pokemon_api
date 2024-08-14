@@ -3,9 +3,28 @@
 namespace Drupal\pokemon_api\Resource;
 
 /**
- * ResourceInterface.
+ * Interface for Resource.
  */
 interface ResourceInterface {
+
+  /**
+   * Get the endpoint.
+   *
+   * @return string
+   *   The endpoint.
+   */
+  public static function getEndpoint(): string;
+
+  /**
+   * Create a resource from an array.
+   *
+   * @param array $data
+   *   The data.
+   *
+   * @return ResourceInterface
+   *   The resource.
+   */
+  public function createFromArray(array $data): ResourceInterface;
 
   /**
    * Get the field.
@@ -16,7 +35,7 @@ interface ResourceInterface {
    * @return mixed
    *   The field value.
    */
-  public function get(string $field);
+  public function get(string $field): mixed;
 
   /**
    * Get the name.
@@ -24,7 +43,7 @@ interface ResourceInterface {
    * @return string
    *   The name.
    */
-  public function getName();
+  public function getName(): string;
 
   /**
    * Set the name.
@@ -40,7 +59,7 @@ interface ResourceInterface {
    * @return int
    *   The id.
    */
-  public function getId();
+  public function getId(): ?int;
 
   /**
    * Set the id.
@@ -56,7 +75,7 @@ interface ResourceInterface {
    * @return string
    *   The url.
    */
-  public function getUrl(): string;
+  public function getUrl(): ?string;
 
   /**
    * Set the url.

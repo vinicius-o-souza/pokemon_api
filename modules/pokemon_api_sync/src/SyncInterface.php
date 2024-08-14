@@ -2,7 +2,7 @@
 
 namespace Drupal\pokemon_api_sync;
 
-use Drupal\pokemon_api\Resource\Resource;
+use Drupal\pokemon_api\Resource\ResourceInterface;
 
 /**
  * Sync resources interface.
@@ -17,9 +17,9 @@ interface SyncInterface {
   /**
    * Synchronizes a Resource object.
    *
-   * @param \Drupal\pokemon_api\Resource\Resource $resource
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   The resourve object to synchronize.
    */
-  public function sync(Resource $resource): void;
+  public function sync(ResourceInterface $resource): void;
 
 }

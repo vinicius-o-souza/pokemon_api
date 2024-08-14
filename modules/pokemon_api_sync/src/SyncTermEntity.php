@@ -4,7 +4,7 @@ namespace Drupal\pokemon_api_sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\pokemon_api\Resource\Resource;
+use Drupal\pokemon_api\Resource\ResourceInterface;
 
 /**
  * Sync taxonomy term entity.
@@ -13,7 +13,7 @@ abstract class SyncTermEntity extends SyncEntity {
 
   /**
    * Get vocabulary id.
-   * 
+   *
    * @return string
    *   Vocabulary id.
    */
@@ -45,14 +45,14 @@ abstract class SyncTermEntity extends SyncEntity {
 
   /**
    * Get data fields.
-   * 
-   * @param \Drupal\pokemon_api\Resource\Resource $resource
+   *
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   Resource.
-   * 
+   *
    * @return array
    *   Data fields.
    */
-  protected function getDataFields(Resource $resource): array {
+  protected function getDataFields(ResourceInterface $resource): array {
     return [
       'name' => ucfirst($resource->getName()),
       'vid' => $this->getVid(),

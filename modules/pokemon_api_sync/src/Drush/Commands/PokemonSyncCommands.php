@@ -21,7 +21,7 @@ final class PokemonSyncCommands extends DrushCommands {
    */
   public function __construct(
     private readonly Connection $database,
-    private readonly PokemonSync $pokemonSync
+    private readonly PokemonSync $pokemonSync,
   ) {
     parent::__construct();
   }

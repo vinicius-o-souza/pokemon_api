@@ -2,17 +2,19 @@
 
 namespace Drupal\my_paragraph_limit\Plugin\Validation\Constraint;
 
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
+/**
+ * Custom validation constraint for limiting paragraphs by stat term.
+ */
 class StatParagraphLimitConstraintValidator extends ConstraintValidator {
 
   /**
    * {@inheritdoc}
    */
-  public function validate($items, Constraint $constraint) {
+  public function validate(mixed $items, Constraint $constraint): void {
     if (!$items instanceof FieldItemListInterface) {
       return;
     }
@@ -20,10 +22,9 @@ class StatParagraphLimitConstraintValidator extends ConstraintValidator {
     $existing_terms = [];
 
     foreach ($items as $delta => $item) {
-      /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
       $paragraph = $item->entity;
 
-      if ($paragraph instanceof EntityInterface) {
+      if ($paragraph) {
         $term = $paragraph->get('pokemon_stat')->entity;
 
         if ($term) {
@@ -36,4 +37,5 @@ class StatParagraphLimitConstraintValidator extends ConstraintValidator {
       }
     }
   }
+
 }

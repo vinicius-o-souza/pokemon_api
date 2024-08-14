@@ -6,8 +6,8 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\pokemon_api\ApiResource\PokemonApi;
-use Drupal\pokemon_api\Resource\Resource;
 use Drupal\pokemon_api\Resource\Pokemon;
+use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncInterface;
 use Drupal\pokemon_api_sync\SyncNodeEntity;
 
@@ -18,15 +18,14 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
 
   /**
    * Order maximum.
-   * 
+   *
    * @var int
-   * 
    */
   private const ORDER_MAXIMUM = 10000;
 
   /**
    * List of taxonomy terms needed.
-   * 
+   *
    * @var array
    */
   private array $taxonomyTerms = [];
@@ -37,35 +36,46 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
     protected LoggerChannelInterface $logger,
-    private readonly PokemonApi $pokemonApi
+    private readonly PokemonApi $pokemonApi,
   ) {
     $this->taxonomyTerms = $this->getAllTermsNeeded();
   }
 
+  /**
+   * Get all taxonomy terms needed.
+   *
+   * @return array
+   *   List of taxonomy terms needed.
+   */
   private function getAllTermsNeeded(): array {
-    $types = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
+    $storage = $this->entityTypeManager->getStorage('taxonomy_term');
+    /** @var \Drupal\taxonomy\Entity\Term[] $types */
+    $types = $storage->loadByProperties([
       'vid' => 'pokemon_type',
     ]);
     foreach ($types as $key => $type) {
       $types[$type->get('field_pokeapi_id')->getString()] = $type;
     }
 
-    $stats = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
+    /** @var \Drupal\taxonomy\Entity\Term[] $stats */
+    $stats = $storage->loadByProperties([
       'vid' => 'pokemon_stat',
     ]);
     foreach ($stats as $key => $stat) {
       $stats[$stat->get('field_pokeapi_id')->getString()] = $stat;
     }
 
-    $abilities = [];
-    // $abilities = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
-    //   'vid' => 'pokemon_ability',
-    // ]);
+    /** @var \Drupal\taxonomy\Entity\Term[] $abilities */
+    $abilities = $storage->loadByProperties(['vid' => 'pokemon_ability']);
+    foreach ($abilities as $key => $ability) {
+      $abilities[$ability->get('field_pokeapi_id')->getString()] = $ability;
+    }
 
-    $moves = [];
-    // $moves = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
-    //   'vid' => 'pokemon_move',
-    // ]);
+    /** @var \Drupal\taxonomy\Entity\Term[] $moves */
+    $moves = $storage->loadByProperties(['vid' => 'pokemon_move']);
+    foreach ($moves as $key => $move) {
+      $moves[$move->get('field_pokeapi_id')->getString()] = $move;
+    }
 
     return [
       'pokemon_type' => $types,
@@ -89,7 +99,8 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
-  public function sync(Resource $pokemon): void {
+  public function sync(ResourceInterface $pokemon): void {
+    /** @var \Drupal\pokemon_api\Resource\Pokemon $pokemon */
     $pokemon = $this->pokemonApi->getResource($pokemon->getId());
 
     $node = $this->readEntity($pokemon->getId());
@@ -125,7 +136,15 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   }
 
   /**
-   * {@inheritdoc}
+   * Retrieves the data fields for a given Pokemon.
+   *
+   * @param \Drupal\pokemon_api\Resource\Pokemon $pokemon
+   *   The Pokemon object.
+   * @param \Drupal\Core\Entity\ContentEntityBase|null $node
+   *   The content entity.
+   *
+   * @return array
+   *   The data fields.
    */
   private function getDataFields(Pokemon $pokemon, ?ContentEntityBase $node): array {
     $stats = $this->getOrCreateStatParagaphs($pokemon->getStats(), $node);
@@ -153,12 +172,12 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
 
   /**
    * Get array of pokemon api IDs.
-   * 
+   *
    * @param string $vid
    *   The vid.
    * @param array $resourceApiIds
    *   The resource api ids.
-   * 
+   *
    * @return array
    *   List of pokemon types api IDs.
    */
@@ -175,12 +194,12 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
 
   /**
    * Get or create pokemon stats.
-   * 
+   *
    * @param array $pokemonStats
    *   The stats terms.
    * @param \Drupal\Core\Entity\ContentEntityBase|null $node
    *   The pokemon node.
-   * 
+   *
    * @return array
    *   The stats.
    */
@@ -196,7 +215,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
             $paragraph->set('field_pokemon_stat', $this->taxonomyTerms['pokemon_stat'][$statPokeApiId]);
             $paragraph->set('field_pokemon_base_stat', $pokemonStats[$statPokeApiId]);
             $paragraph->save();
-  
+
             $stats[] = [
               'target_id' => $paragraph->id(),
               'target_revision_id' => $paragraph->getRevisionId(),
@@ -209,13 +228,14 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
 
     foreach ($pokemonStats as $key => $stat) {
       if ($this->taxonomyTerms['pokemon_stat'][$key]) {
+        /** @var \Drupal\paragraphs\Entity\Paragraph $paragraph */
         $paragraph = $this->entityTypeManager->getStorage('paragraph')->create([
           'type' => 'pokemon_stat',
           'field_pokemon_stat' => $this->taxonomyTerms['pokemon_stat'][$key],
           'field_pokemon_base_stat' => $stat,
         ]);
         $paragraph->save();
-        
+
         $stats[] = [
           'target_id' => $paragraph->id(),
           'target_revision_id' => $paragraph->getRevisionId(),

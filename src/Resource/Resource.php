@@ -6,6 +6,7 @@ namespace Drupal\pokemon_api\Resource;
  * Abtract Resource class to get from Pokemon API.
  */
 abstract class Resource implements ResourceInterface {
+
   /**
    * Constructs a Resource object.
    *
@@ -19,21 +20,15 @@ abstract class Resource implements ResourceInterface {
   public function __construct(
     protected string $name,
     protected string|null $url = NULL,
-    protected int|null $id = NULL
+    protected int|null $id = NULL,
   ) {
     $this->name = ucfirst($name);
     if (!$id) {
-      $this->id = self::extractIdFromUrl($url);
+      if ($url) {
+        $this->id = self::extractIdFromUrl($url);
+      }
     }
   }
-
-  /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
-   */
-  abstract public static function getEndpoint(): string;
 
   /**
    * {@inheritdoc}
@@ -59,7 +54,7 @@ abstract class Resource implements ResourceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getId(): int {
+  public function getId(): ?int {
     return $this->id;
   }
 
@@ -73,7 +68,7 @@ abstract class Resource implements ResourceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getUrl(): string {
+  public function getUrl(): ?string {
     return $this->url;
   }
 

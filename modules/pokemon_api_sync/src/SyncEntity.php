@@ -22,7 +22,7 @@ abstract class SyncEntity implements SyncEntityInterface {
    */
   public function __construct(
     protected EntityTypeManagerInterface $entityTypeManager,
-    protected LoggerChannelInterface $logger
+    protected LoggerChannelInterface $logger,
   ) {}
 
   /**
