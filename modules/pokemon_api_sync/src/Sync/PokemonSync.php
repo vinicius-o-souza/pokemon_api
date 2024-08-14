@@ -79,7 +79,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    * {@inheritdoc}
    */
   public function syncAll(): void {
-    $pokemons = $this->pokemonApi->getResourcesPagination(1, 0);
+    $pokemons = $this->pokemonApi->getResourcesPagination(2000, 0);
 
     foreach ($pokemons as $pokemon) {
       $this->sync($pokemon);
@@ -94,7 +94,6 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
 
     $node = $this->readEntity($pokemon->getId());
     $data = $this->getDataFields($pokemon, $node);
-    dd($data);
 
     if ($node) {
       $node = $this->updateEntity($node, $data);
@@ -167,7 +166,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     $terms = [];
     foreach ($this->taxonomyTerms[$vid] as $pokeApiId => $term) {
       if (array_key_exists($pokeApiId, $resourceApiIds)) {
-        $terms[] = $term->id();
+        $terms[] = $term;
       }
     }
 
@@ -198,7 +197,10 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
             $paragraph->set('field_pokemon_base_stat', $pokemonStats[$statPokeApiId]);
             $paragraph->save();
   
-            $stats[] = $paragraph->id();
+            $stats[] = [
+              'target_id' => $paragraph->id(),
+              'target_revision_id' => $paragraph->getRevisionId(),
+            ];
             unset($pokemonStats[$statPokeApiId]);
           }
         }
@@ -213,7 +215,11 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
           'field_pokemon_base_stat' => $stat,
         ]);
         $paragraph->save();
-        $stats[] = $paragraph->id(); 
+        
+        $stats[] = [
+          'target_id' => $paragraph->id(),
+          'target_revision_id' => $paragraph->getRevisionId(),
+        ];
       }
     }
 

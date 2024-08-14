@@ -61,12 +61,8 @@ class StatSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
-  private function getDataFields(Stat $stat): array {
-    return [
-      'name' => ucfirst($stat->getName()),
-      'vid' => 'pokemon_stat',
-      'field_pokeapi_id' => $stat->getId(),
-    ];
+  public function getVid(): string {
+    return 'pokemon_stat';
   }
 
   /**

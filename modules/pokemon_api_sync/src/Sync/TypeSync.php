@@ -61,12 +61,8 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
-  private function getDataFields(Type $type): array {
-    return [
-      'name' => ucfirst($type->getName()),
-      'vid' => 'pokemon_type',
-      'field_pokeapi_id' => $type->getId(),
-    ];
+  public function getVid(): string {
+    return 'pokemon_type';
   }
 
   /**
