@@ -8,6 +8,13 @@ namespace Drupal\pokemon_api;
 class Translation {
 
   /**
+   * The language code for English.
+   *
+   * @var string
+   */
+  public const EN_LANGUAGE = 'en';
+
+  /**
    * The language code for Espanish.
    *
    * @var string
@@ -26,12 +33,19 @@ class Translation {
    *
    * @param array $translations
    *   The translations to be stored.
+   * @param string $position
+   *   The position of the translation.
    */
-  public function __construct(protected array $translations) {
+  public function __construct(protected array $translations, string $position = 'name') {
     $this->translations = [];
 
     foreach ($translations as $translation) {
-      $this->translations[$translation['language']['name']] = ucfirst($translation['name']);
+      $languageCode = $translation['language']['name'];
+      if (in_array($languageCode, [self::EN_LANGUAGE, self::ES_LANGUAGE, self::PT_BR_LANGUAGE])) {
+        if (!isset($this->translations[$languageCode])) {
+          $this->translations[$languageCode] = ucfirst(trim($translation[$position])); 
+        }
+      }
     }
   }
 

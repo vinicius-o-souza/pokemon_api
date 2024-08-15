@@ -14,14 +14,14 @@ class Ability extends TranslatableResource {
    *
    * @var string
    */
-  private const ENDPOINT = 'stat';
+  private const ENDPOINT = 'ability';
 
   /**
-   * The effect of this ability listed in different languages.
+   * The flavor text of this ability listed in different languages.
    *
    * @var \Drupal\pokemon_api\Translation
    */
-  private Translation $effectEntries;
+  private Translation $flavorText;
 
   /**
    * Get the endpoint.
@@ -39,29 +39,29 @@ class Ability extends TranslatableResource {
   public static function createFromArray(array $data): Ability {
     $ability = new Ability($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
     $ability->setNames($data['names'] ?? []);
-    $ability->setEffectEntries($data['effect_entries'] ?? []);
+    $ability->setFlavorText($data['flavor_text_entries'] ?? []);
 
     return $ability;
   }
 
   /**
-   * Get the effect of this ability listed in different languages.
+   * Get the flavor text of this ability listed in different languages.
    *
    * @return \Drupal\pokemon_api\Translation
-   *   The effect of this ability listed in different languages.
+   *   The flavor text of this ability listed in different languages.
    */
-  public function getEffectEntries(): Translation {
-    return $this->effectEntries;
+  public function getFlavorText(): Translation {
+    return $this->flavorText;
   }
 
   /**
-   * Set the effect of this ability listed in different languages.
+   * Set the flavor text of this ability listed in different languages.
    *
-   * @param array $effectEntries
-   *   The effect of this ability listed in different languages.
+   * @param array $flavorText
+   *   The flavor text of this ability listed in different languages.
    */
-  public function setEffectEntries(array $effectEntries): void {
-    $this->effectEntries = new Translation($effectEntries);
+  public function setFlavorText(array $flavorText): void {
+    $this->flavorText = new Translation($flavorText, 'flavor_text');
   }
 
 }

@@ -3,21 +3,21 @@
 namespace Drupal\pokemon_api\ApiResource;
 
 use Drupal\pokemon_api\ApiResource;
-use Drupal\pokemon_api\Resource\Ability;
+use Drupal\pokemon_api\Resource\Move;
 
 /**
- * Class AbilityApi to manage abilities.
+ * Class MoveApi to manage Moves.
  */
-class AbilityApi extends ApiResource {
+class MoveApi extends ApiResource {
 
   /**
    * {@inheritdoc}
    *
-   * @return class-string<Ability>
+   * @return class-string<Move>
    *   The resource model.
    */
   protected function getResourceModel(): string {
-    return Ability::class;
+    return Move::class;
   }
 
 }
