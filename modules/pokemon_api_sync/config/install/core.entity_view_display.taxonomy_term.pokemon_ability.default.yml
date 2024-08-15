@@ -19,14 +19,6 @@ content:
     third_party_settings: {  }
     weight: 0
     region: content
-  field_pokeapi_id:
-    type: number_integer
-    label: above
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
-    third_party_settings: {  }
-    weight: 1
-    region: content
 hidden:
+  field_pokeapi_id: true
   langcode: true

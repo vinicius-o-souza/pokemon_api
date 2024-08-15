@@ -1,0 +1,74 @@
+uuid: ce4c54be-4f93-4d6d-9e08-4329871bc950
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.pokemon_move.field_accuracy
+    - field.field.taxonomy_term.pokemon_move.field_effect_change
+    - field.field.taxonomy_term.pokemon_move.field_pokeapi_id
+    - field.field.taxonomy_term.pokemon_move.field_power
+    - field.field.taxonomy_term.pokemon_move.field_power_points
+    - field.field.taxonomy_term.pokemon_move.field_priority
+    - taxonomy.vocabulary.pokemon_move
+  module:
+    - text
+id: taxonomy_term.pokemon_move.default
+targetEntityType: taxonomy_term
+bundle: pokemon_move
+mode: default
+content:
+  description:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_accuracy:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_effect_change:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_power:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_power_points:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_priority:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 4
+    region: content
+hidden:
+  field_pokeapi_id: true
+  langcode: true

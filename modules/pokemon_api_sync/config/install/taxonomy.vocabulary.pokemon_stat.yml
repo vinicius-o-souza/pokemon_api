@@ -2,7 +2,7 @@ uuid: 66710676-0d50-4498-b825-253d0206e7fe
 langcode: en
 status: true
 dependencies: {  }
-name: Stats
+name: 'Pokemon Stats'
 vid: pokemon_stat
 description: 'Stats determine certain aspects of battles. Each Pokémon has a value for each stat which grows as they gain levels and can be al'
 weight: 0

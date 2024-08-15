@@ -5,14 +5,21 @@ dependencies:
   config:
     - field.field.node.pokemon.body
     - field.field.node.pokemon.field_pokeapi_id
+    - field.field.node.pokemon.field_pokemon_abilities
     - field.field.node.pokemon.field_pokemon_experience
     - field.field.node.pokemon.field_pokemon_height
+    - field.field.node.pokemon.field_pokemon_moves
+    - field.field.node.pokemon.field_pokemon_order
+    - field.field.node.pokemon.field_pokemon_stats
     - field.field.node.pokemon.field_pokemon_types
     - field.field.node.pokemon.field_pokemon_weight
     - node.type.pokemon
   module:
+    - entity_reference_revisions
     - text
     - user
+_core:
+  default_config_hash: '-qE1AescPQmQk8LuX0_5x3n4jVKU1CRPHFn3NGAREM8'
 id: node.pokemon.default
 targetEntityType: node
 bundle: pokemon
@@ -34,6 +41,14 @@ content:
     third_party_settings: {  }
     weight: 102
     region: content
+  field_pokemon_abilities:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 110
+    region: content
   field_pokemon_experience:
     type: number_integer
     label: above
@@ -51,6 +66,32 @@ content:
       prefix_suffix: true
     third_party_settings: {  }
     weight: 105
+    region: content
+  field_pokemon_moves:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 109
+    region: content
+  field_pokemon_order:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 107
+    region: content
+  field_pokemon_stats:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 108
     region: content
   field_pokemon_types:
     type: entity_reference_label

@@ -1,16 +1,16 @@
-uuid: 89a7c01d-4995-474b-85ec-2ab747e4dcbd
+uuid: aa7d6794-08eb-4eeb-a830-57d130b79d42
 langcode: en
 status: true
 dependencies:
   config:
-    - taxonomy.vocabulary.pokemon_stat
+    - taxonomy.vocabulary.pokemon_move
   module:
     - content_translation
 third_party_settings:
   content_translation:
     enabled: true
-id: taxonomy_term.pokemon_stat
+id: taxonomy_term.pokemon_move
 target_entity_type_id: taxonomy_term
-target_bundle: pokemon_stat
+target_bundle: pokemon_move
 default_langcode: site_default
 language_alterable: true
