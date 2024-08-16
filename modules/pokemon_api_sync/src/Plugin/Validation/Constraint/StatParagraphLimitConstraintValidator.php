@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\my_paragraph_limit\Plugin\Validation\Constraint;
+namespace Drupal\pokemon_api_sync\Plugin\Validation\Constraint;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Symfony\Component\Validator\Constraint;
@@ -25,7 +25,7 @@ class StatParagraphLimitConstraintValidator extends ConstraintValidator {
       $paragraph = $item->entity;
 
       if ($paragraph) {
-        $term = $paragraph->get('pokemon_stat')->entity;
+        $term = $paragraph->get('field_pokemon_stat')->entity;
 
         if ($term) {
           if (in_array($term->id(), $existing_terms)) {

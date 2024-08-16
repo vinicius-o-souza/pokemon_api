@@ -148,7 +148,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    */
   private function getDataFields(Pokemon $pokemon, ?ContentEntityBase $node): array {
     $abilites = $this->getTermsByApiIds('pokemon_ability', $pokemon->getAbilities());
-    $moves = $this->getTermsByApiIds('pokemon_move', $pokemon->getTypes());
+    // $moves = $this->getTermsByApiIds('pokemon_move', $pokemon->getMoves());
     $stats = $this->getOrCreateStatParagaphs($pokemon->getStats(), $node);
     $types = $this->getTermsByApiIds('pokemon_type', $pokemon->getTypes());
 
@@ -164,7 +164,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
       'field_pokemon_order' => $pokemon->getOrder(),
       'field_pokemon_weight' => $pokemon->getWeight(),
       'field_pokemon_abilities' => $abilites,
-      'field_pokemon_moves' => $moves,
+      // 'field_pokemon_moves' => $moves,
       // 'field_pokemon_sprites' => $pokemon->getSprites(),
       // 'field_pokemon_species' => $pokemon->getSpecies(),
       'field_pokemon_stats' => $stats,
