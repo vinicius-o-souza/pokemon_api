@@ -1,0 +1,29 @@
+uuid: 33dfcedf-a366-4eb5-a1af-2af21121fe15
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_pokemon_moves
+    - node.type.pokemon
+    - taxonomy.vocabulary.pokemon_move
+id: node.pokemon.field_pokemon_moves
+field_name: field_pokemon_moves
+entity_type: node
+bundle: pokemon
+label: Moves
+description: 'Moves are the skills of Pokémon in battle. In battle, a Pokémon uses one move each turn. Some moves (including those learned by Hidden Machine) can be used outside of battle as well, usually for the purpose of removing obstacles or exploring new areas.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:taxonomy_term'
+  handler_settings:
+    target_bundles:
+      pokemon_move: pokemon_move
+    sort:
+      field: name
+      direction: asc
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference
