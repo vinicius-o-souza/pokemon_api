@@ -1,4 +1,4 @@
-uuid: a3538682-426b-4390-9af6-49711e96d73a
+uuid: 7e09f500-3592-4392-ae95-6645d56170b9
 langcode: en
 status: true
 dependencies:
@@ -7,10 +7,10 @@ dependencies:
 id: node.field_pokemon_height
 field_name: field_pokemon_height
 entity_type: node
-type: integer
+type: decimal
 settings:
-  unsigned: false
-  size: normal
+  precision: 10
+  scale: 2
 module: core
 locked: false
 cardinality: 1

@@ -68,6 +68,31 @@ class MoveSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
+  protected function getDataFields(ResourceInterface $resource): array {
+    $data = parent::getDataFields($resource);
+
+    if ($resource instanceof Move) {
+      $data['field_accuracy'] = $resource->getAccuracy();
+      $data['field_effect_change'] = $resource->getEffectChange();
+      $data['field_power'] = $resource->getPower();
+      $data['field_power_points'] = $resource->getPowerPoints();
+      $data['field_priority'] = $resource->getPriority();
+
+      $type = $resource->getType();
+      $type = $this->getStorageClass()->loadByProperties([
+        'vid' => 'pokemon_type',
+        'field_pokeapi_id' => $type->getId(),
+      ]);
+  
+      $data['field_type'] = $type;
+    }
+
+    return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   private function getTranslatableFields(Move $move): array {
     return [
       'name' => $move->getNames(),

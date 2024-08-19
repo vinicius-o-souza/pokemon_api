@@ -47,33 +47,18 @@ content:
     settings:
       link: true
     third_party_settings: {  }
-    weight: 9
-    region: content
-  field_pokemon_experience:
-    type: number_integer
-    label: inline
-    settings:
-      thousand_separator: ''
-      prefix_suffix: true
-    third_party_settings: {  }
     weight: 6
     region: content
   field_pokemon_height:
-    type: number_integer
+    type: number_decimal
     label: inline
     settings:
       thousand_separator: ''
+      decimal_separator: .
+      scale: 2
       prefix_suffix: true
     third_party_settings: {  }
     weight: 5
-    region: content
-  field_pokemon_moves:
-    type: entity_reference_label
-    label: inline
-    settings:
-      link: true
-    third_party_settings: {  }
-    weight: 8
     region: content
   field_pokemon_stats:
     type: entity_reference_revisions_entity_view
@@ -93,10 +78,12 @@ content:
     weight: 3
     region: content
   field_pokemon_weight:
-    type: number_integer
+    type: number_decimal
     label: inline
     settings:
       thousand_separator: ''
+      decimal_separator: .
+      scale: 2
       prefix_suffix: true
     third_party_settings: {  }
     weight: 4
@@ -107,5 +94,7 @@ content:
     weight: 0
     region: content
 hidden:
+  field_pokemon_experience: true
+  field_pokemon_moves: true
   field_pokemon_order: true
   langcode: true

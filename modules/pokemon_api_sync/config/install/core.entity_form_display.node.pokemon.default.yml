@@ -67,7 +67,7 @@ content:
     third_party_settings: {  }
   field_pokemon_height:
     type: number
-    weight: 5
+    weight: 30
     region: content
     settings:
       placeholder: ''
@@ -119,7 +119,7 @@ content:
     third_party_settings: {  }
   field_pokemon_weight:
     type: number
-    weight: 4
+    weight: 31
     region: content
     settings:
       placeholder: ''

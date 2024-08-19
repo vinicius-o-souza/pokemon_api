@@ -60,6 +60,13 @@ class Move extends TranslatableResource {
   private Translation $flavorText;
 
   /**
+   * The type of this move.
+   *
+   * @var \Drupal\pokemon_api\Resource\Type
+   */
+  private Type|null $type;
+
+  /**
    * Get the endpoint.
    *
    * @return string
@@ -81,6 +88,11 @@ class Move extends TranslatableResource {
     $move->setPowerPoints($data['pp'] ?? 0);
     $move->setPriority($data['priority'] ?? 0);
     $move->setFlavorText($data['flavor_text_entries'] ?? []);
+
+    if (isset($data['type'])) {
+      $type = new Type($data['type']['name'], $data['type']['url'] ?? NULL, $data['type']['id'] ?? NULL);
+      $move->setType($type); 
+    }
 
     return $move;
   }
@@ -199,6 +211,26 @@ class Move extends TranslatableResource {
    */
   public function setFlavorText(array $flavorText): void {
     $this->flavorText = new Translation($flavorText, 'flavor_text');
+  }
+
+  /**
+   * Get the type of this move.
+   *
+   * @return \Drupal\pokemon_api\Resource\Type
+   *   The type of this move.
+   */
+  public function getType(): Type {
+    return $this->type;
+  }
+
+  /**
+   * Set the type of this move.
+   *
+   * @param \Drupal\pokemon_api\Resource\Type
+   *   The type of this move.
+   */
+  public function setType(?Type $type = NULL): void {
+    $this->type = $type;
   }
 
 }

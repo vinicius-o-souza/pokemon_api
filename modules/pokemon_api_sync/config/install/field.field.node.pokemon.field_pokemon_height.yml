@@ -1,4 +1,4 @@
-uuid: 27449cbf-66e8-405f-9043-4dc9d2d54cb2
+uuid: 980fbf71-9059-41e3-a058-91d81675c971
 langcode: en
 status: true
 dependencies:
@@ -10,14 +10,14 @@ field_name: field_pokemon_height
 entity_type: node
 bundle: pokemon
 label: Height
-description: ''
+description: 'The height of this Pokémon in meters.'
 required: true
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  min: 0
+  min: 0.0
   max: null
   prefix: ''
-  suffix: ''
-field_type: integer
+  suffix: m
+field_type: decimal
