@@ -89,7 +89,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
    * {@inheritdoc}
    */
   public function syncAll(): void {
-    $pokemons = $this->pokemonApi->getResourcesPagination(2000, 0);
+    $pokemons = $this->pokemonApi->getAllResources();
 
     foreach ($pokemons as $pokemon) {
       $this->sync($pokemon);
