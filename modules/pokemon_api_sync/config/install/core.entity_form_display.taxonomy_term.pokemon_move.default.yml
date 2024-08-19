@@ -9,6 +9,7 @@ dependencies:
     - field.field.taxonomy_term.pokemon_move.field_power
     - field.field.taxonomy_term.pokemon_move.field_power_points
     - field.field.taxonomy_term.pokemon_move.field_priority
+    - field.field.taxonomy_term.pokemon_move.field_type
     - taxonomy.vocabulary.pokemon_move
   module:
     - path
@@ -66,6 +67,16 @@ content:
     weight: 104
     region: content
     settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_type:
+    type: entity_reference_autocomplete
+    weight: 106
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
       placeholder: ''
     third_party_settings: {  }
   langcode:

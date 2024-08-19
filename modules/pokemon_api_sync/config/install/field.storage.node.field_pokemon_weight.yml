@@ -1,4 +1,4 @@
-uuid: 0183cedf-a4f0-4ef9-bff2-75d0ddabd40a
+uuid: 30b79525-e782-47bb-ae44-b3a41396a24c
 langcode: en
 status: true
 dependencies:
@@ -7,10 +7,10 @@ dependencies:
 id: node.field_pokemon_weight
 field_name: field_pokemon_weight
 entity_type: node
-type: integer
+type: decimal
 settings:
-  unsigned: false
-  size: normal
+  precision: 10
+  scale: 2
 module: core
 locked: false
 cardinality: 1

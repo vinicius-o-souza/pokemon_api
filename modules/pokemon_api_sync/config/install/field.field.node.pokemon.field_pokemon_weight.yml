@@ -1,4 +1,4 @@
-uuid: 72671137-572e-4d93-ba40-048f79852087
+uuid: 94e39de9-a02b-463d-b1b5-6c85588636fe
 langcode: en
 status: true
 dependencies:
@@ -10,14 +10,14 @@ field_name: field_pokemon_weight
 entity_type: node
 bundle: pokemon
 label: Weight
-description: ''
+description: 'The weight of this Pokémon in kilogrames.'
 required: true
 translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  min: 0
+  min: 0.0
   max: null
   prefix: ''
-  suffix: ''
-field_type: integer
+  suffix: kg
+field_type: decimal
