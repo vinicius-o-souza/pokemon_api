@@ -43,7 +43,7 @@ class Translation {
       $languageCode = $translation['language']['name'];
       if (in_array($languageCode, [self::EN_LANGUAGE, self::ES_LANGUAGE, self::PT_BR_LANGUAGE])) {
         if (!isset($this->translations[$languageCode])) {
-          $this->translations[$languageCode] = ucfirst(trim($translation[$position])); 
+          $this->translations[$languageCode] = ucfirst(trim(str_replace("\n", "", $translation[$position])));
         }
       }
     }

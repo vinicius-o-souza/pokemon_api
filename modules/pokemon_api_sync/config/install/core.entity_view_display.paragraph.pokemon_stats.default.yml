@@ -13,7 +13,7 @@ mode: default
 content:
   field_pokemon_base_stat:
     type: number_integer
-    label: above
+    label: hidden
     settings:
       thousand_separator: ''
       prefix_suffix: true
@@ -22,9 +22,9 @@ content:
     region: content
   field_pokemon_stat:
     type: entity_reference_label
-    label: above
+    label: hidden
     settings:
-      link: true
+      link: false
     third_party_settings: {  }
     weight: 0
     region: content

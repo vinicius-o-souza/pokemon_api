@@ -24,9 +24,9 @@ class Pokemon extends Resource {
   /**
    * The height of this Pokémon in decimetres.
    *
-   * @var int
+   * @var float
    */
-  private int $height;
+  private float $height;
 
   /**
    * Order for sorting. Almost national order.
@@ -38,9 +38,9 @@ class Pokemon extends Resource {
   /**
    * The weight of this Pokémon in hectograms.
    *
-   * @var int
+   * @var float
    */
-  private int $weight;
+  private float $weight;
 
   /**
    * A list of abilities this Pokémon could potentially have.
@@ -136,21 +136,21 @@ class Pokemon extends Resource {
   /**
    * Get the height of this Pokemon in decimetres.
    *
-   * @return int
+   * @return float
    *   The height of this Pokemon in decimetres.
    */
-  public function getHeight(): int {
+  public function getHeight(): float {
     return $this->height;
   }
 
   /**
    * Set the height of this Pokemon in decimetres.
    *
-   * @param int $height
+   * @param float $height
    *   The height of this Pokemon in decimetres.
    */
-  public function setHeight(int $height): void {
-    $this->height = $height;
+  public function setHeight(float $height): void {
+    $this->height = $height / 10;
   }
 
   /**
@@ -176,21 +176,21 @@ class Pokemon extends Resource {
   /**
    * Get the weight of this Pokemon in hectograms.
    *
-   * @return int
+   * @return float
    *   The weight of this Pokemon in hectograms.
    */
-  public function getWeight(): int {
+  public function getWeight(): float {
     return $this->weight;
   }
 
   /**
    * Set the weight of this Pokemon in hectograms.
    *
-   * @param int $weight
+   * @param float $weight
    *   The weight of this Pokemon in hectograms.
    */
-  public function setWeight(int $weight): void {
-    $this->weight = $weight;
+  public function setWeight(float $weight): void {
+    $this->weight = $weight / 10;
   }
 
   /**
@@ -210,7 +210,11 @@ class Pokemon extends Resource {
    *   The abilities.
    */
   public function setAbilities(array $abilities): void {
-    $this->abilities = $abilities;
+    $pokemonAbilities = [];
+    foreach ($abilities as $ability) {
+      $pokemonAbilities[self::extractIdFromUrl($ability['ability']['url'])] = $ability['ability']['name'];
+    }
+    $this->abilities = $pokemonAbilities;
   }
 
   /**
@@ -230,7 +234,11 @@ class Pokemon extends Resource {
    *   The moves.
    */
   public function setMoves(array $moves): void {
-    $this->moves = $moves;
+    $pokemonMoves = [];
+    foreach ($moves as $move) {
+      $pokemonMoves[self::extractIdFromUrl($move['move']['url'])] = $move['move']['name'];
+    }
+    $this->moves = $pokemonMoves;
   }
 
   /**
