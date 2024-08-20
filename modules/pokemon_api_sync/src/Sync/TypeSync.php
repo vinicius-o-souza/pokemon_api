@@ -2,9 +2,6 @@
 
 namespace Drupal\pokemon_api_sync\Sync;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Logger\LoggerChannelInterface;
-use Drupal\pokemon_api\ApiResource\TypeApi;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api\Resource\Type;
 use Drupal\pokemon_api_sync\SyncInterface;
@@ -16,19 +13,11 @@ use Drupal\pokemon_api_sync\SyncTermEntity;
 class TypeSync extends SyncTermEntity implements SyncInterface {
 
   /**
-   * Constructs a TypeSync object.
-   */
-  public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected LoggerChannelInterface $logger,
-    private readonly TypeApi $typeApi,
-  ) {}
-
-  /**
    * {@inheritdoc}
    */
   public function syncAll(): void {
-    $types = $this->typeApi->getAllResources();
+    $type = new Type();
+    $types = $this->pokeApi->getAllResources($type);
 
     foreach ($types as $type) {
       $this->sync($type);
@@ -39,7 +28,11 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
    * {@inheritdoc}
    */
   public function sync(ResourceInterface $type): void {
-    $type = $this->typeApi->getResource($type->getId());
+    $type = $this->pokeApi->getResource($type);
+
+    if (!$type->getId()) {
+      return;
+    }
 
     $term = $this->readEntity($type->getId());
     $data = $this->getDataFields($type);
@@ -68,9 +61,12 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
-  private function getTranslatableFields(Type $type): array {
+  protected function getTranslatableFields(ResourceInterface $resource): array {
+    if (!$resource instanceof Type) {
+      return [];
+    }
     return [
-      'name' => $type->getNames(),
+      'name' => $resource->getNames(),
     ];
   }
 

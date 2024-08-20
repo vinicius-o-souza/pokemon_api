@@ -10,15 +10,15 @@ abstract class Resource implements ResourceInterface {
   /**
    * Constructs a Resource object.
    *
-   * @param string $name
+   * @param string|null $name
    *   The name of the resource.
-   * @param string $url
+   * @param string|null $url
    *   The URL of the resource.
-   * @param int $id
+   * @param int|null $id
    *   The ID of the resource.
    */
   public function __construct(
-    protected string $name,
+    protected string|null $name = NULL,
     protected string|null $url = NULL,
     protected int|null $id = NULL,
   ) {
@@ -34,7 +34,13 @@ abstract class Resource implements ResourceInterface {
    * {@inheritdoc}
    */
   public function get(string $field): mixed {
-    return $this->$field;
+    if (property_exists($this, $field)) {
+      $value = $this->$field;
+      return $value ?? NULL;
+    }
+    else {
+      throw new \InvalidArgumentException("$field is not a valid field for " . get_class($this));
+    }
   }
 
   /**

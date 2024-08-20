@@ -2,12 +2,12 @@
 
 namespace Drupal\pokemon_api\Resource;
 
-use Drupal\pokemon_api\Translation;
-
 /**
  * Resource Move class.
  */
 class Move extends TranslatableResource {
+
+  use FlavorTextTrait;
 
   /**
    * The endpoint.
@@ -28,10 +28,10 @@ class Move extends TranslatableResource {
    *
    * @var int
    */
-  private int $effectChange;
+  private int $effectChance;
 
   /**
-   * The base power of this move with a value of 0 if it does not have a base power.
+   * Base power with a value of 0 if it does not have a base power.
    *
    * @var int
    */
@@ -46,18 +46,10 @@ class Move extends TranslatableResource {
 
   /**
    * Sets the order in which moves are executed during battle.
-   * A value between -8 and 8.
    *
    * @var int
    */
   private int $priority;
-
-  /**
-   * The flavor text of this move listed in different languages.
-   *
-   * @var \Drupal\pokemon_api\Translation
-   */
-  private Translation $flavorText;
 
   /**
    * The type of this move.
@@ -83,7 +75,7 @@ class Move extends TranslatableResource {
     $move = new Move($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
     $move->setNames($data['names'] ?? []);
     $move->setAccuracy($data['accuracy'] ?? 0);
-    $move->setEffectChange($data['effect_chance'] ?? 0);
+    $move->setEffectChance($data['effect_chance'] ?? 0);
     $move->setPower($data['power'] ?? 0);
     $move->setPowerPoints($data['pp'] ?? 0);
     $move->setPriority($data['priority'] ?? 0);
@@ -91,7 +83,7 @@ class Move extends TranslatableResource {
 
     if (isset($data['type'])) {
       $type = new Type($data['type']['name'], $data['type']['url'] ?? NULL, $data['type']['id'] ?? NULL);
-      $move->setType($type); 
+      $move->setType($type);
     }
 
     return $move;
@@ -101,6 +93,7 @@ class Move extends TranslatableResource {
    * Gets the accuracy of this move.
    *
    * @return int
+   *   The accuracy of this move.
    */
   public function getAccuracy(): int {
     return $this->accuracy;
@@ -110,6 +103,7 @@ class Move extends TranslatableResource {
    * Sets the accuracy of this move.
    *
    * @param int $accuracy
+   *   The accuracy of this move.
    */
   public function setAccuracy(int $accuracy): void {
     if ($accuracy < 0 || $accuracy > 100) {
@@ -119,27 +113,30 @@ class Move extends TranslatableResource {
   }
 
   /**
-   * Gets the effect change of this move.
+   * Gets the effect chance of this move.
    *
-   * @return string
+   * @return int
+   *   The effect chance of this move.
    */
-  public function getEffectChange(): string {
-    return $this->effectChange;
+  public function getEffectChance(): int {
+    return $this->effectChance;
   }
 
   /**
-   * Sets the effect change of this move.
+   * Sets the effect chance of this move.
    *
-   * @param string $effectChange
+   * @param int $effectChance
+   *   The effect chance of this move.
    */
-  public function setEffectChange(string $effectChange): void {
-    $this->effectChange = $effectChange;
+  public function setEffectChance(int $effectChance): void {
+    $this->effectChance = $effectChance;
   }
 
   /**
    * Gets the base power of this move.
    *
    * @return int
+   *   The base power of this move.
    */
   public function getPower(): int {
     return $this->power;
@@ -149,6 +146,7 @@ class Move extends TranslatableResource {
    * Sets the base power of this move.
    *
    * @param int $power
+   *   The base power of this move.
    */
   public function setPower(int $power): void {
     $this->power = $power;
@@ -158,6 +156,7 @@ class Move extends TranslatableResource {
    * Gets the power points of this move.
    *
    * @return int
+   *   The power points of this move.
    */
   public function getPowerPoints(): int {
     return $this->powerPoints;
@@ -167,6 +166,7 @@ class Move extends TranslatableResource {
    * Sets the power points of this move.
    *
    * @param int $powerPoints
+   *   The power points of this move.
    */
   public function setPowerPoints(int $powerPoints): void {
     $this->powerPoints = $powerPoints;
@@ -176,6 +176,7 @@ class Move extends TranslatableResource {
    * Gets the priority of this move.
    *
    * @return int
+   *   The priority of this move.
    */
   public function getPriority(): int {
     return $this->priority;
@@ -185,32 +186,13 @@ class Move extends TranslatableResource {
    * Sets the priority of this move.
    *
    * @param int $priority
+   *   The priority of this move.
    */
   public function setPriority(int $priority): void {
     if ($priority < -8 || $priority > 8) {
       throw new \InvalidArgumentException('Priority must be between -8 and 8');
     }
     $this->priority = $priority;
-  }
-
-  /**
-   * Get the effect of this move listed in different languages.
-   *
-   * @return \Drupal\pokemon_api\Translation
-   *   The flavor text of this move listed in different languages.
-   */
-  public function getFlavorText(): Translation {
-    return $this->flavorText;
-  }
-
-  /**
-   * Set the effect of this move listed in different languages.
-   *
-   * @param array $flavorText
-   *   The flavor text of this move listed in different languages.
-   */
-  public function setFlavorText(array $flavorText): void {
-    $this->flavorText = new Translation($flavorText, 'flavor_text');
   }
 
   /**
@@ -226,7 +208,7 @@ class Move extends TranslatableResource {
   /**
    * Set the type of this move.
    *
-   * @param \Drupal\pokemon_api\Resource\Type
+   * @param \Drupal\pokemon_api\Resource\Type $type
    *   The type of this move.
    */
   public function setType(?Type $type = NULL): void {

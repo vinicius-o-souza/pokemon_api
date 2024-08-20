@@ -5,6 +5,7 @@ namespace Drupal\pokemon_api_sync;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api\Translation;
 
 /**
@@ -19,10 +20,13 @@ abstract class SyncEntity implements SyncEntityInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The logger.
+   * @param \Drupal\pokemon_api\PokeApi $pokeApi
+   *   The PokeApi.
    */
   public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected LoggerChannelInterface $logger,
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly LoggerChannelInterface $logger,
+    protected readonly PokeApi $pokeApi,
   ) {}
 
   /**

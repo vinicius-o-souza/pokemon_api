@@ -12,21 +12,21 @@ interface PokeApiInterface {
   /**
    * Retrieves all resources from the PokeAPI.
    *
-   * @param string $resourceClass
-   *   The resource string class.
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
+   *   The resource.
    *
    * @return \Drupal\pokemon_api\ResponseResourceIterator
    *   The resource iterator.
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function getAllResources(string $resourceClass): ResponseResourceIterator;
+  public function getAllResources(ResourceInterface $resource): ResponseResourceIterator;
 
   /**
    * Retrieves all resources from the PokeAPI.
    *
-   * @param string $resourceClass
-   *   The resource string class.
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
+   *   The resource.
    * @param int $limit
    *   Limit the number of items.
    * @param int $offset
@@ -37,21 +37,19 @@ interface PokeApiInterface {
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function getResourcesPagination(string $resourceClass, int $limit, int $offset): ResponseResourceIterator;
+  public function getResourcesPagination(ResourceInterface $resource, int $limit, int $offset = 0): ResponseResourceIterator;
 
   /**
    * Retrieves a resource from the PokeAPI.
    *
-   * @param string $resourceClass
-   *   The resource string class.
-   * @param int $id
-   *   The id of the resource.
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
+   *   The resource.
    *
    * @return \Drupal\pokemon_api\Resource\ResourceInterface
    *   The resource.
    *
    * @throws \GuzzleHttp\Exception\GuzzleException
    */
-  public function getResource(string $resourceClass, int $id): ResourceInterface;
+  public function getResource(ResourceInterface $resource): ResourceInterface;
 
 }
