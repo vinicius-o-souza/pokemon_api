@@ -27,6 +27,18 @@ class TypeSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
+  public function syncPagination(int $limit, int $offset): void {
+    $type = new Type();
+    $types = $this->pokeApi->getResourcesPagination($type, $limit, $offset);
+
+    foreach ($types as $type) {
+      $this->sync($type);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function sync(ResourceInterface $type): void {
     $type = $this->pokeApi->getResource($type);
 
