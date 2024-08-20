@@ -2,9 +2,6 @@
 
 namespace Drupal\pokemon_api_sync\Sync;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Logger\LoggerChannelInterface;
-use Drupal\pokemon_api\ApiResource\MoveApi;
 use Drupal\pokemon_api\Resource\Move;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncInterface;
@@ -16,45 +13,14 @@ use Drupal\pokemon_api_sync\SyncTermEntity;
 class MoveSync extends SyncTermEntity implements SyncInterface {
 
   /**
-   * Constructs a MoveSync object.
-   */
-  public function __construct(
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected LoggerChannelInterface $logger,
-    private readonly MoveApi $moveApi,
-  ) {}
-
-  /**
    * {@inheritdoc}
    */
   public function syncAll(): void {
-    $moves = $this->moveApi->getAllResources();
+    $move = new Move();
+    $moves = $this->pokeApi->getAllResources($move);
 
     foreach ($moves as $move) {
       $this->sync($move);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sync(ResourceInterface $move): void {
-    $move = $this->moveApi->getResource($move->getId());
-
-    $term = $this->readEntity($move->getId());
-    $data = $this->getDataFields($move);
-
-    if ($term) {
-      $term = $this->updateEntity($term, $data);
-    }
-    else {
-      $term = $this->createEntity($data);
-    }
-
-    if ($term && $move instanceof Move) {
-      $translatableFields = $this->getTranslatableFields($move);
-      $term = $this->addTranslation($term, $translatableFields);
-      $term->save();
     }
   }
 
@@ -73,7 +39,7 @@ class MoveSync extends SyncTermEntity implements SyncInterface {
 
     if ($resource instanceof Move) {
       $data['field_accuracy'] = $resource->getAccuracy();
-      $data['field_effect_change'] = $resource->getEffectChange();
+      $data['field_effect_change'] = $resource->getEffectChance();
       $data['field_power'] = $resource->getPower();
       $data['field_power_points'] = $resource->getPowerPoints();
       $data['field_priority'] = $resource->getPriority();
@@ -83,7 +49,7 @@ class MoveSync extends SyncTermEntity implements SyncInterface {
         'vid' => 'pokemon_type',
         'field_pokeapi_id' => $type->getId(),
       ]);
-  
+
       $data['field_type'] = $type;
     }
 
@@ -93,10 +59,13 @@ class MoveSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
-  private function getTranslatableFields(Move $move): array {
+  protected function getTranslatableFields(ResourceInterface $resource): array {
+    if (!$resource instanceof Move) {
+      return [];
+    }
     return [
-      'name' => $move->getNames(),
-      'description' => $move->getFlavorText(),
+      'name' => $resource->getNames(),
+      'description' => $resource->getFlavorText(),
     ];
   }
 

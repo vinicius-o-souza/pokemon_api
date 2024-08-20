@@ -24,31 +24,23 @@ class ResponseResourceIterator implements \Iterator {
   private $position = 0;
 
   /**
-   * The resource string class.
+   * The resource class.
    *
-   * @var string
+   * @var \Drupal\pokemon_api\Resource\ResourceInterface
    */
-  private $resourceClass;
+  private $resource;
 
   /**
    * Constructs a new instance of the class.
    *
    * @param array $response
    *   The response from the API.
-   * @param string $resourceClass
-   *   The resource string class.
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
+   *   The resource class.
    */
-  public function __construct(array $response, string $resourceClass) {
+  public function __construct(array $response, ResourceInterface $resource) {
     $this->response = $response;
-    if (!class_exists($resourceClass)) {
-      throw new \Exception('Resource class not found.');
-    }
-
-    if (!is_subclass_of($resourceClass, ResourceInterface::class)) {
-      throw new \Exception('Resource class must implement ResourceInterface.');
-    }
-
-    $this->resourceClass = $resourceClass;
+    $this->resource = $resource;
   }
 
   /**
@@ -58,7 +50,7 @@ class ResponseResourceIterator implements \Iterator {
    *   The current element.
    */
   public function current(): ResourceInterface {
-    return $this->resourceClass::createFromArray($this->response['results'][$this->position]);
+    return $this->resource::createFromArray($this->response['results'][$this->position]);
   }
 
   /**

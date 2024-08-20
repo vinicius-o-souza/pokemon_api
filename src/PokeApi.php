@@ -44,10 +44,8 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   /**
    * {@inheritdoc}
    */
-  public function getAllResources(string $resourceClass): ResponseResourceIterator {
-    $this->validateResourceClass($resourceClass);
-
-    $endpoint = $resourceClass::getEndpoint();
+  public function getAllResources(ResourceInterface $resource): ResponseResourceIterator {
+    $endpoint = $resource::getEndpoint();
 
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
@@ -55,15 +53,14 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return new ResponseResourceIterator($response, $resourceClass);
+    return new ResponseResourceIterator($response, $resource);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getResourcesPagination(string $resourceClass, int $limit, int $offset): ResponseResourceIterator {
-    $this->validateResourceClass($resourceClass);
-    $endpoint = $resourceClass::getEndpoint();
+  public function getResourcesPagination(ResourceInterface $resource, int $limit, int $offset = 0): ResponseResourceIterator {
+    $endpoint = $resource::getEndpoint();
 
     $url = $this->pokemonApiUrl . $endpoint;
     $response = $this->get($url, [], [
@@ -72,42 +69,22 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
     ]);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    return new ResponseResourceIterator($response, $resourceClass);
+    return new ResponseResourceIterator($response, $resource);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getResource(string $resourceClass, int $id): ResourceInterface {
-    $this->validateResourceClass($resourceClass);
-    $endpoint = $resourceClass::getEndpoint();
+  public function getResource(ResourceInterface $resource): ResourceInterface {
+    $endpoint = $resource::getEndpoint();
 
-    $url = $this->pokemonApiUrl . $endpoint . '/' . $id;
+    $url = $this->pokemonApiUrl . $endpoint . '/' . $resource->getId();
     $response = $this->get($url, [], []);
     $response = json_decode($response->getBody()->getContents(), TRUE);
 
-    $resource = $resourceClass::createFromArray($response);
+    $resource = $resource::createFromArray($response);
 
     return $resource;
-  }
-
-  /**
-   * Retrieves and validates a resource class.
-   *
-   * @param string $resourceClass
-   *   The name of the resource class.
-   *
-   * @throws \Exception
-   *   If resource does not exist or does not implement ResourceInterface.
-   */
-  private function validateResourceClass(string $resourceClass): void {
-    if (!class_exists($resourceClass)) {
-      throw new \Exception('Resource class not found.');
-    }
-
-    if (!is_subclass_of($resourceClass, ResourceInterface::class)) {
-      throw new \Exception('Resource class must implement ResourceInterface.');
-    }
   }
 
 }

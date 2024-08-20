@@ -8,6 +8,13 @@ namespace Drupal\pokemon_api\Resource;
 class Pokemon extends Resource {
 
   /**
+   * Order maximum.
+   *
+   * @var int
+   */
+  private const ORDER_MAXIMUM = 10000;
+
+  /**
    * The endpoint.
    *
    * @var string
@@ -57,20 +64,6 @@ class Pokemon extends Resource {
   private array $moves;
 
   /**
-   * A set of sprites used to depict this Pokémon in the game.
-   *
-   * @var array
-   */
-  private array $sprites;
-
-  /**
-   * The species this Pokémon belongs to.
-   *
-   * @var array
-   */
-  private array $species;
-
-  /**
    * A list of base stat values for this Pokémon.
    *
    * @var array
@@ -105,8 +98,6 @@ class Pokemon extends Resource {
     $pokemon->setWeight($data['weight'] ?? 0);
     $pokemon->setAbilities($data['abilities'] ?? []);
     $pokemon->setMoves($data['moves'] ?? []);
-    $pokemon->setSprites($data['sprites'] ?? []);
-    $pokemon->setSpecies($data['species'] ?? []);
     $pokemon->setStats($data['stats'] ?? []);
     $pokemon->setTypes($data['types'] ?? []);
 
@@ -170,7 +161,7 @@ class Pokemon extends Resource {
    *   The order for sorting. Almost national order.
    */
   public function setOrder(int $order): void {
-    $this->order = $order;
+    $this->order = $order < 0 ? self::ORDER_MAXIMUM + $order : $order;
   }
 
   /**
@@ -239,46 +230,6 @@ class Pokemon extends Resource {
       $pokemonMoves[self::extractIdFromUrl($move['move']['url'])] = $move['move']['name'];
     }
     $this->moves = $pokemonMoves;
-  }
-
-  /**
-   * Get the sprites.
-   *
-   * @return array
-   *   The sprites.
-   */
-  public function getSprites(): array {
-    return $this->sprites;
-  }
-
-  /**
-   * Set the sprites.
-   *
-   * @param array $sprites
-   *   The sprites.
-   */
-  public function setSprites(array $sprites): void {
-    $this->sprites = $sprites;
-  }
-
-  /**
-   * Get the species.
-   *
-   * @return array
-   *   The species.
-   */
-  public function getSpecies(): array {
-    return $this->species;
-  }
-
-  /**
-   * Set the species.
-   *
-   * @param array $species
-   *   The species.
-   */
-  public function setSpecies(array $species): void {
-    $this->species = $species;
   }
 
   /**
