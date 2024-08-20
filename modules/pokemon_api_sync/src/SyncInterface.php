@@ -15,6 +15,16 @@ interface SyncInterface {
   public function syncAll(): void;
 
   /**
+   * Command to sync all resources.
+   * 
+   * @param int $limit
+   *   The number of resources to sync.
+   * @param int $offset
+   *   The offset of resources to sync.
+   */
+  public function syncPagination(int $limit, int $offset): void;
+
+  /**
    * Synchronizes a Resource object.
    *
    * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource

@@ -40,13 +40,12 @@ final class PokemonSyncCommands extends DrushCommands {
    * Command to synchronize pokemon pokemons.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-pokemon', aliases: ['sync-pokemon'])]
-  #[CLI\Usage(name: 'pokemon_api_sync:sync-pokemon', description: 'Usage description')]
-  public function syncPokemon(): void {
-
+  #[CLI\Option(name: 'limit', description: 'Limit of pokemon pokemons to sync.')]
+  #[CLI\Option(name: 'offset', description: 'Limit of pokemon pokemons to sync.')]
+  public function syncPokemon(array $options = ['limit' => 10, 'offset' => 0]): void {
     $connection = $this->database->startTransaction();
     try {
-
-      $this->pokemonSync->syncAll();
+      $this->pokemonSync->syncPagination($options['limit'], $options['offset']);
       if ($this->logger) {
         $this->logger->info('Pokemon pokemons synchronization successfully');
       }

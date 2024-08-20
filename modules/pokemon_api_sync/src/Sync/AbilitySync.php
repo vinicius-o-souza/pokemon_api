@@ -27,6 +27,18 @@ class AbilitySync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
+  public function syncPagination(int $limit, int $offset): void {
+    $ability = new Ability();
+    $abilities = $this->pokeApi->getResourcesPagination($ability, $limit, $offset);
+
+    foreach ($abilities as $ability) {
+      $this->sync($ability);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getVid(): string {
     return 'pokemon_ability';
   }

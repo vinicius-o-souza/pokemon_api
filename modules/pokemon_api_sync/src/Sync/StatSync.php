@@ -27,6 +27,18 @@ class StatSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
+  public function syncPagination(int $limit, int $offset): void {
+    $stat = new Stat();
+    $stats = $this->pokeApi->getResourcesPagination($stat, $limit, $offset);
+
+    foreach ($stats as $stat) {
+      $this->sync($stat);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getVid(): string {
     return 'pokemon_stat';
   }

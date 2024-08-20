@@ -27,6 +27,18 @@ class MoveSync extends SyncTermEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
+  public function syncPagination(int $limit, int $offset): void {
+    $move = new Move();
+    $moves = $this->pokeApi->getResourcesPagination($move, $limit, $offset);
+
+    foreach ($moves as $move) {
+      $this->sync($move);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getVid(): string {
     return 'pokemon_move';
   }

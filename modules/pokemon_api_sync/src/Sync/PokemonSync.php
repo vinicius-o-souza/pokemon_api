@@ -39,6 +39,22 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
+  public function syncPagination(int $limit, int $offset): void {
+    if (empty($this->taxonomyTerms)) {
+      $this->taxonomyTerms = $this->getAllTerms();
+    }
+    
+    $pokemon = new Pokemon();
+    $pokemons = $this->pokeApi->getResourcesPagination($pokemon, $limit, $offset);
+
+    foreach ($pokemons as $pokemon) {
+      $this->sync($pokemon);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   protected function getDataFields(ResourceInterface $resource, ?ContentEntityBase $node): array {
     if (!$resource instanceof Pokemon) {
       throw new \Exception('Invalid resource type.');
