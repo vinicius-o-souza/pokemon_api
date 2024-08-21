@@ -51,7 +51,7 @@ class MoveSync extends SyncTermEntity implements SyncInterface {
 
     if ($resource instanceof Move) {
       $data['field_accuracy'] = $resource->getAccuracy();
-      $data['field_effect_change'] = $resource->getEffectChance();
+      $data['field_effect_chance'] = $resource->getEffectChance();
       $data['field_power'] = $resource->getPower();
       $data['field_power_points'] = $resource->getPowerPoints();
       $data['field_priority'] = $resource->getPriority();
