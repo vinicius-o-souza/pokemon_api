@@ -2,6 +2,8 @@
 
 namespace Drupal\pokemon_api\Resource;
 
+use Drupal\pokemon_api\Endpoints;
+
 /**
  * Resource Pokemon class.
  */
@@ -15,25 +17,18 @@ class Pokemon extends Resource {
   private const ORDER_MAXIMUM = 10000;
 
   /**
-   * The endpoint.
-   *
-   * @var string
-   */
-  private const ENDPOINT = 'pokemon';
-
-  /**
    * The base experience gained for defeating this Pokémon.
    *
    * @var int
    */
-  private int $baseExperience;
+  private int $baseExperience = 0;
 
   /**
    * The height of this Pokémon in decimetres.
    *
    * @var float
    */
-  private float $height;
+  private float $height = 0.0;
 
   /**
    * Order for sorting. Almost national order.
@@ -47,7 +42,7 @@ class Pokemon extends Resource {
    *
    * @var float
    */
-  private float $weight;
+  private float $weight = 0.0;
 
   /**
    * A list of abilities this Pokémon could potentially have.
@@ -84,24 +79,7 @@ class Pokemon extends Resource {
    *   The endpoint.
    */
   public static function getEndpoint(): string {
-    return self::ENDPOINT;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function createFromArray(array $data): Pokemon {
-    $pokemon = new Pokemon($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
-    $pokemon->setBaseExperience($data['base_experience'] ?? 0);
-    $pokemon->setHeight($data['height'] ?? 0);
-    $pokemon->setOrder($data['order'] ?? 0);
-    $pokemon->setWeight($data['weight'] ?? 0);
-    $pokemon->setAbilities($data['abilities'] ?? []);
-    $pokemon->setMoves($data['moves'] ?? []);
-    $pokemon->setStats($data['stats'] ?? []);
-    $pokemon->setTypes($data['types'] ?? []);
-
-    return $pokemon;
+    return Endpoints::POKEMON->value;
   }
 
   /**

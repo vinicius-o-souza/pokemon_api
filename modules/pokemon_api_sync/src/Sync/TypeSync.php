@@ -2,64 +2,25 @@
 
 namespace Drupal\pokemon_api_sync\Sync;
 
+use Drupal\pokemon_api\Endpoints;
+use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api\Resource\Type;
-use Drupal\pokemon_api_sync\SyncInterface;
 use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
  * Sync Pokemon Type taxonomy.
  */
-class TypeSync extends SyncTermEntity implements SyncInterface {
+class TypeSync extends SyncTermEntity {
 
   /**
    * {@inheritdoc}
    */
-  public function syncAll(): void {
-    $type = new Type();
-    $types = $this->pokeApi->getAllResources($type);
+  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
+    $types = $this->pokeApi->getResources(Endpoints::TYPE->value, $limit, $offset);
 
     foreach ($types as $type) {
-      $this->sync($type);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function syncPagination(int $limit, int $offset): void {
-    $type = new Type();
-    $types = $this->pokeApi->getResourcesPagination($type, $limit, $offset);
-
-    foreach ($types as $type) {
-      $this->sync($type);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function sync(ResourceInterface $type): void {
-    $type = $this->pokeApi->getResource($type);
-
-    if (!$type->getId()) {
-      return;
-    }
-
-    $term = $this->readEntity($type->getId());
-    $data = $this->getDataFields($type);
-
-    if ($term) {
-      $term = $this->updateEntity($term, $data);
-    }
-    else {
-      $term = $this->createEntity($data);
-    }
-
-    if ($term && $type instanceof Type) {
-      $translatableFields = $this->getTranslatableFields($type);
-      $term = $this->addTranslation($term, $translatableFields);
-      $term->save();
+      $this->syncResource($type);
     }
   }
 

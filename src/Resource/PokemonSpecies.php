@@ -2,17 +2,12 @@
 
 namespace Drupal\pokemon_api\Resource;
 
+use Drupal\pokemon_api\Endpoints;
+
 /**
  * Resource PokemonSpecies class.
  */
 class PokemonSpecies extends Resource {
-
-  /**
-   * The endpoint.
-   *
-   * @var string
-   */
-  private const ENDPOINT = 'pokemon-species';
 
   /**
    * The is legendary flag.
@@ -42,17 +37,29 @@ class PokemonSpecies extends Resource {
    *   The endpoint.
    */
   public static function getEndpoint(): string {
-    return self::ENDPOINT;
+    return Endpoints::POKEMON_SPECIES->value;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function createFromArray(array $data): PokemonSpecies {
-    $pokemonSpecies = new PokemonSpecies($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
-    $pokemonSpecies->setIsLegendary($data['is_legendary'] ?? FALSE);
-    $pokemonSpecies->setIsMythical($data['is_mythical'] ?? FALSE);
-    $pokemonSpecies->setGeneration(Generation::createFromArray($data['generation'] ?? []));
+    if (empty($data['url'])) {
+      if (empty($data['id'])) {
+        throw new \InvalidArgumentException('Missing required "url" or "id" key in data.'); 
+      }
+
+      $data['url'] = $data['id'];
+    }
+
+    $pokemonSpecies = new self($data['url'], $data['name'] ?? '');
+    $pokemonSpecies->setIsLegendary($data['is_legendary'] ?? []);
+    $pokemonSpecies->setIsMythical($data['is_mythical'] ?? []);
+    
+    if (isset($data['generation'])) {
+      $generation = Generation::createFromArray($data['generation']);
+      $pokemonSpecies->setGeneration($generation);
+    }
 
     return $pokemonSpecies;
   }

@@ -8,26 +8,25 @@ namespace Drupal\pokemon_api\Resource;
 abstract class Resource implements ResourceInterface {
 
   /**
+   * The ID of the resource.
+   */
+  protected int $id;
+
+  /**
    * Constructs a Resource object.
    *
-   * @param string|null $name
-   *   The name of the resource.
-   * @param string|null $url
+   * @param string $url
    *   The URL of the resource.
-   * @param int|null $id
-   *   The ID of the resource.
+   * @param string $name
+   *   The name of the resource.
    */
-  public function __construct(
-    protected string|null $name = NULL,
-    protected string|null $url = NULL,
-    protected int|null $id = NULL,
+  final public function __construct(
+    protected string $url,
+    protected string $name = '',
   ) {
     $this->name = ucfirst($name);
-    if (!$id) {
-      if ($url) {
-        $this->id = self::extractIdFromUrl($url);
-      }
-    }
+    $this->url = $url;
+    $this->id = self::extractIdFromUrl($url);
   }
 
   /**
@@ -60,7 +59,7 @@ abstract class Resource implements ResourceInterface {
   /**
    * {@inheritdoc}
    */
-  public function getId(): ?int {
+  public function getId(): int {
     return $this->id;
   }
 
@@ -83,6 +82,32 @@ abstract class Resource implements ResourceInterface {
    */
   public function setUrl(string $url): void {
     $this->url = $url;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function createFromArray(array $data): self {
+    if (empty($data['url'])) {
+      if (empty($data['id'])) {
+        throw new \InvalidArgumentException('Missing required "url" or "id" key in data.'); 
+      }
+
+      $data['url'] = $data['id'];
+    }
+
+    $resorce = new static($data['url'], $data['name'] ?? '');
+
+    foreach ($data as $key => $value) {
+      // Convert snake_case to camelCase.
+      $key = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+      $setter = 'set' . ucfirst($key);
+      if (method_exists($resorce, $setter) && !empty($value)) {
+        $resorce->$setter($value);
+      }
+    }
+
+    return $resorce;
   }
 
   /**

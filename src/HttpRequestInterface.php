@@ -14,16 +14,17 @@ interface HttpRequestInterface {
    *
    * @param string $url
    *   The URL to send the request to.
-   * @param array $header
+   * @param array $headers
    *   The headers to include in the request.
-   * @param array $params
-   *   The parameters to include in the request.
+   * @param array $queryParameters
+   *   The query parameters to include in the request.
    *
    * @return \Psr\Http\Message\ResponseInterface
    *   The response from the server.
    *
-   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @throws \Exception
+   *   If there was an error sending the request.
    */
-  public function get(string $url, array $header, array $params): ResponseInterface;
+  public function get(string $url, array $headers, array $queryParameters): ResponseInterface;
 
 }

@@ -9,6 +9,16 @@ services:
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api']
     tags:
       - { name: service }
+  pokemon_api_sync.evolution_sync:
+    class: \Drupal\pokemon_api_sync\Sync\EvolutionSync
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api']
+    tags:
+      - { name: service }
+  pokemon_api_sync.generation_sync:
+    class: \Drupal\pokemon_api_sync\Sync\GenerationSync
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api']
+    tags:
+      - { name: service }
   pokemon_api_sync.move_sync:
     class: \Drupal\pokemon_api_sync\Sync\MoveSync
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api']
@@ -16,6 +26,11 @@ services:
       - { name: service }
   pokemon_api_sync.pokemon_sync:
     class: \Drupal\pokemon_api_sync\Sync\PokemonSync
+    arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api', '@pokemon_api_sync.pokemon_service']
+    tags:
+      - { name: service }
+  pokemon_api_sync.pokemon_species_sync:
+    class: \Drupal\pokemon_api_sync\Sync\PokemonSpeciesSync
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api']
     tags:
       - { name: service }
@@ -29,3 +44,21 @@ services:
     arguments: ['@entity_type.manager', '@logger.channel.pokemon_api_sync', '@pokemon_api.poke_api']
     tags:
       - { name: service }
+
+  # Services
+  pokemon_api_sync.move_paragraph_service:
+    class: \Drupal\pokemon_api_sync\Service\MoveParagraphService
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: service }
+  pokemon_api_sync.pokemon_service:
+    class: \Drupal\pokemon_api_sync\Service\PokemonService
+    arguments: ['@pokemon_api_sync.move_paragraph_service', '@pokemon_api_sync.stat_paragraph_service']
+    tags:
+      - { name: service }
+  pokemon_api_sync.stat_paragraph_service:
+    class: \Drupal\pokemon_api_sync\Service\StatParagraphService
+    arguments: ['@entity_type.manager']
+    tags:
+      - { name: service }
+  

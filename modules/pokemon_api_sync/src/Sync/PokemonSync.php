@@ -3,15 +3,36 @@
 namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\pokemon_api\Endpoints;
+use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api\Resource\Pokemon;
 use Drupal\pokemon_api\Resource\ResourceInterface;
-use Drupal\pokemon_api_sync\SyncInterface;
+use Drupal\pokemon_api_sync\Service\PokemonService;
 use Drupal\pokemon_api_sync\SyncNodeEntity;
 
 /**
  * Sync Pokemon node.
  */
-class PokemonSync extends SyncNodeEntity implements SyncInterface {
+class PokemonSync extends SyncNodeEntity {
+
+  /**
+   * Constructs a PokemonSync object.
+   *
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
+   *   The entity type manager.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The logger.
+   * @param \Drupal\pokemon_api\PokeApi $pokeApi
+   *   The PokeApi.
+   */
+  public function __construct(
+    protected readonly EntityTypeManagerInterface $entityTypeManager,
+    protected readonly LoggerChannelInterface $logger,
+    protected readonly PokeApi $pokeApi,
+    protected readonly PokemonService $pokemonService
+  ) {}
 
   /**
    * List of taxonomy terms needed.
@@ -23,32 +44,22 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
   /**
    * {@inheritdoc}
    */
-  public function syncAll(): void {
-    if (empty($this->taxonomyTerms)) {
-      $this->taxonomyTerms = $this->getAllTerms();
-    }
-
-    $pokemon = new Pokemon();
-    $pokemons = $this->pokeApi->getAllResources($pokemon);
-
-    foreach ($pokemons as $pokemon) {
-      $this->sync($pokemon);
-    }
+  public function getContentType(): string {
+    return 'pokemon';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function syncPagination(int $limit, int $offset): void {
+  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
     if (empty($this->taxonomyTerms)) {
       $this->taxonomyTerms = $this->getAllTerms();
     }
-    
-    $pokemon = new Pokemon();
-    $pokemons = $this->pokeApi->getResourcesPagination($pokemon, $limit, $offset);
+
+    $pokemons = $this->pokeApi->getResources(Endpoints::POKEMON->value, $limit, $offset);
 
     foreach ($pokemons as $pokemon) {
-      $this->sync($pokemon);
+      $this->syncResource($pokemon);
     }
   }
 
@@ -65,8 +76,7 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     }
 
     $abilites = $this->getTermsByApiIds('pokemon_ability', $resource->getAbilities());
-    // $moves = $this->getTermsByApiIds('pokemon_move', $resource->getMoves());
-    $stats = $this->getOrCreateStatParagraphs($resource->getStats(), $node);
+    $paragraphs = $this->pokemonService->getParagraphs($resource, $node);
     $types = $this->getTermsByApiIds('pokemon_type', $resource->getTypes());
 
     return [
@@ -78,9 +88,25 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
       'field_pokemon_order' => $resource->getOrder(),
       'field_pokemon_weight' => $resource->getWeight(),
       'field_pokemon_abilities' => $abilites,
-      // 'field_pokemon_moves' => $moves,
-      'field_pokemon_stats' => $stats,
+      'field_pokemon_moves' => $paragraphs['moves'],
+      'field_pokemon_stats' => $paragraphs['stats'],
       'field_pokemon_types' => $types,
+    ];
+  }
+
+  /**
+   * Get all taxonomy terms needed.
+   *
+   * @return array
+   *   List of taxonomy terms needed.
+   */
+  private function getAllTerms(): array {
+    $types = $this->getTermsByVid('pokemon_type');
+    $abilities = $this->getTermsByVid('pokemon_ability');
+
+    return [
+      'pokemon_type' => $types,
+      'pokemon_ability' => $abilities,
     ];
   }
 
@@ -104,92 +130,6 @@ class PokemonSync extends SyncNodeEntity implements SyncInterface {
     }
 
     return $terms;
-  }
-
-  /**
-   * Get or create pokemon stats.
-   *
-   * @param array $pokemonStats
-   *   The stats terms.
-   * @param \Drupal\Core\Entity\ContentEntityBase|null $node
-   *   The pokemon node.
-   *
-   * @return array
-   *   The stats.
-   */
-  private function getOrCreateStatParagraphs(array $pokemonStats, ?ContentEntityBase $node): array {
-    $stats = [];
-    if ($node) {
-      /** @var \Drupal\paragraphs\Entity\Paragraph[] $paragraphs */
-      $paragraphs = $node->get('field_pokemon_stats')->referencedEntities();
-      foreach ($paragraphs as $paragraph) {
-        $statTerm = $paragraph->get('field_pokemon_stat')->entity;
-        if ($statTerm) {
-          $statPokeApiId = $statTerm->get('field_pokeapi_id')->value;
-          if ($statPokeApiId) {
-            $paragraph->set('field_pokemon_base_stat', $pokemonStats[$statPokeApiId]);
-            $paragraph->save();
-
-            $stats[] = [
-              'target_id' => $paragraph->id(),
-              'target_revision_id' => $paragraph->getRevisionId(),
-            ];
-            unset($pokemonStats[$statPokeApiId]);
-          }
-        }
-      }
-    }
-
-    foreach ($pokemonStats as $key => $stat) {
-      if ($this->taxonomyTerms['pokemon_stat'][$key]) {
-        $stats[] = $this->createStatParagraph($this->taxonomyTerms['pokemon_stat'][$key], $stat);
-      }
-    }
-
-    return $stats;
-  }
-
-  /**
-   * Get all taxonomy terms needed.
-   *
-   * @return array
-   *   List of taxonomy terms needed.
-   */
-  private function getAllTerms(): array {
-    $types = $this->getTermsByVid('pokemon_type');
-    $stats = $this->getTermsByVid('pokemon_stat');
-    $abilities = $this->getTermsByVid('pokemon_ability');
-
-    return [
-      'pokemon_type' => $types,
-      'pokemon_stat' => $stats,
-      'pokemon_ability' => $abilities,
-    ];
-  }
-
-  /**
-   * Create stat paragraph.
-   *
-   * @param int $termId
-   *   The term id.
-   * @param int $stat
-   *   The stat.
-   *
-   * @return array
-   *   The stat paragraph.
-   */
-  private function createStatParagraph(int $termId, int $stat): array {
-    $paragraph = $this->entityTypeManager->getStorage('paragraph')->create([
-      'type' => 'pokemon_stats',
-      'field_pokemon_stat' => $termId,
-      'field_pokemon_base_stat' => $stat,
-    ]);
-    $paragraph->save();
-
-    return [
-      'target_id' => $paragraph->id(),
-      'target_revision_id' => $paragraph->getRevisionId(),
-    ];
   }
 
 }

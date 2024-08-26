@@ -5,6 +5,7 @@ namespace Drupal\pokemon_api_sync;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\pokemon_api\Resource\ResourceInterface;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Sync taxonomy term entity.
@@ -40,14 +41,36 @@ abstract class SyncTermEntity extends SyncEntity {
   /**
    * {@inheritdoc}
    */
-  public function sync(ResourceInterface $resource): void {
-    $resource = $this->pokeApi->getResource($resource);
+  public function syncResource(ResourceInterface $resource): void {
+    $this->logger->info('Syncing resource {endpoint}: {resource}', [
+      'endpoint' => $resource->getEndpoint(),
+      'resource' => $resource->getId(),
+    ]);
+    $resource = $this->pokeApi->getResource($resource->getEndpoint(), $resource->getId());
 
     if (!$resource->getId()) {
+      $this->logger->info('Resource {endpoint} not found: {resource}', [
+        'endpoint' => $resource->getEndpoint(),
+        'resource' => $resource->getId(),
+      ]);
       return;
     }
 
-    $term = $this->readEntity($resource->getId());
+    $term = $this->readEntityByPokeId($resource->getId());
+    $this->syncTerm($resource, $term);
+  }
+
+  /**
+   * Syncs a term with the provided resource.
+   *
+   * @param ResourceInterface $resource
+   *   The resource to sync with.
+   * @param ?ContentEntityBase $term
+   *   The term to sync.
+   *
+   * @return void
+   */
+  public function syncTerm(ResourceInterface $resource, ContentEntityBase $term = NULL): void {
     $data = $this->getDataFields($resource);
 
     if ($term) {
@@ -67,10 +90,10 @@ abstract class SyncTermEntity extends SyncEntity {
   /**
    * {@inheritdoc}
    */
-  public function readEntity($id): ?ContentEntityBase {
+  public function readEntityByPokeId(int $pokeApiId): ?ContentEntityBase {
     $entities = $this->getStorageClass()->loadByProperties([
       'vid' => $this->getVid(),
-      'field_pokeapi_id' => $id,
+      'field_pokeapi_id' => $pokeApiId,
     ]);
 
     $entity = array_shift($entities);

@@ -2,37 +2,25 @@
 
 namespace Drupal\pokemon_api_sync\Sync;
 
+use Drupal\pokemon_api\Endpoints;
+use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api\Resource\Move;
 use Drupal\pokemon_api\Resource\ResourceInterface;
-use Drupal\pokemon_api_sync\SyncInterface;
 use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
  * Sync Pokemon Move taxonomy.
  */
-class MoveSync extends SyncTermEntity implements SyncInterface {
+class MoveSync extends SyncTermEntity {
 
   /**
    * {@inheritdoc}
    */
-  public function syncAll(): void {
-    $move = new Move();
-    $moves = $this->pokeApi->getAllResources($move);
+  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
+    $moves = $this->pokeApi->getResources(Endpoints::MOVE->value, $limit, $offset);
 
     foreach ($moves as $move) {
-      $this->sync($move);
-    }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function syncPagination(int $limit, int $offset): void {
-    $move = new Move();
-    $moves = $this->pokeApi->getResourcesPagination($move, $limit, $offset);
-
-    foreach ($moves as $move) {
-      $this->sync($move);
+      $this->syncResource($move);
     }
   }
 

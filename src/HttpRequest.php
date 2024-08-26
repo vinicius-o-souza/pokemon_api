@@ -21,10 +21,10 @@ abstract class HttpRequest implements HttpRequestInterface {
   /**
    * {@inheritdoc}
    */
-  public function get(string $url, array $header, array $params): ResponseInterface {
+  public function get(string $url, array $headers, array $queryParameters): ResponseInterface {
     $response = $this->client->request('GET', $url, [
-      'headers' => $header,
-      'query' => $params,
+      'headers' => $headers,
+      'query' => $queryParameters,
     ]);
 
     return $response;

@@ -32,13 +32,13 @@ interface SyncEntityInterface {
   /**
    * Read a entity by its ID.
    *
-   * @param int $id
-   *   The ID of the entity to read.
+   * @param int $pokeApiId
+   *   The PokeApi ID to read.
    *
    * @return \Drupal\Core\Entity\ContentEntityBase|null
    *   The entity if found, or NULL if not found.
    */
-  public function readEntity($id): ?ContentEntityBase;
+  public function readEntityByPokeId(int $pokeApiId): ?ContentEntityBase;
 
   /**
    * Update an existing entity.
