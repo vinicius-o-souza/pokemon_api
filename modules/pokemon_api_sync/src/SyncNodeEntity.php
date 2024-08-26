@@ -12,6 +12,14 @@ use Drupal\pokemon_api\Resource\ResourceInterface;
 abstract class SyncNodeEntity extends SyncEntity {
 
   /**
+   * Get the content type.
+   *
+   * @return string
+   *   The content type.
+   */
+  abstract public function getContentType(): string;
+
+  /**
    * Retrieves the data fields.
    *
    * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
@@ -34,14 +42,36 @@ abstract class SyncNodeEntity extends SyncEntity {
   /**
    * {@inheritdoc}
    */
-  public function sync(ResourceInterface $resource): void {
-    $resource = $this->pokeApi->getResource($resource);
+  public function syncResource(ResourceInterface $resource): void {
+    $this->logger->info('Syncing resource {endpoint}: {resource}', [
+      'endpoint' => $resource->getEndpoint(),
+      'resource' => $resource->getId(),
+    ]);
+    $resource = $this->pokeApi->getResource($resource->getEndpoint(), $resource->getId());
 
     if (!$resource->getId()) {
+      $this->logger->info('Resource {endpoint} not found: {resource}', [
+        'endpoint' => $resource->getEndpoint(),
+        'resource' => $resource->getId(),
+      ]);
       return;
     }
 
-    $node = $this->readEntity($resource->getId());
+    $node = $this->readEntityByPokeId($resource->getId());
+    $this->syncNode($resource, $node);
+  }
+
+  /**
+   * Syncs a node with the provided resource.
+   *
+   * @param ResourceInterface $resource
+   *   The resource to sync with.
+   * @param ?ContentEntityBase $node
+   *   The node to sync.
+   *
+   * @return void
+   */
+  public function syncNode(ResourceInterface $resource, ContentEntityBase $node = NULL) {
     $data = $this->getDataFields($resource, $node);
 
     if ($node) {
@@ -58,19 +88,38 @@ abstract class SyncNodeEntity extends SyncEntity {
       ];
 
       foreach ($languages as $language) {
-        if (!$node->hasTranslation($language)) {
-          $node->addTranslation($language, [
-            'title' => $resource->getName(),
-          ]);
-          $node->save();
-        }
-        else {
-          $translationNode = $node->getTranslation($language);
-          $translationNode->set('title', $resource->getName());
-          $translationNode->save();
+        if ($resource->getName()) {
+          if (!$node->hasTranslation($language)) {
+            $node->addTranslation($language, [
+              'title' => $resource->getName(),
+            ]);
+            $node->save();
+          }
+          else {
+            $translationNode = $node->getTranslation($language);
+            $translationNode->set('title', $resource->getName());
+            $translationNode->save();
+          }
         }
       }
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function readEntityByPokeId(int $pokeApiId): ?ContentEntityBase {
+    $entities = $this->getStorageClass()->loadByProperties([
+      'type' => $this->getContentType(),
+      'field_pokeapi_id' => $pokeApiId,
+    ]);
+
+    $entity = array_shift($entities);
+    if ($entity instanceof ContentEntityBase) {
+      return $entity;
+    }
+
+    return NULL;
   }
 
   /**

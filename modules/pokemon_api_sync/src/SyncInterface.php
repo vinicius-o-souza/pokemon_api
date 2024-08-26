@@ -2,6 +2,7 @@
 
 namespace Drupal\pokemon_api_sync;
 
+use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 
 /**
@@ -10,19 +11,14 @@ use Drupal\pokemon_api\Resource\ResourceInterface;
 interface SyncInterface {
 
   /**
-   * Command to sync all resources.
-   */
-  public function syncAll(): void;
-
-  /**
-   * Command to sync all resources.
-   * 
+   * Command to sync resources.
+   *
    * @param int $limit
    *   The number of resources to sync.
    * @param int $offset
    *   The offset of resources to sync.
    */
-  public function syncPagination(int $limit, int $offset): void;
+  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void;
 
   /**
    * Synchronizes a Resource object.
@@ -30,6 +26,6 @@ interface SyncInterface {
    * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   The resourve object to synchronize.
    */
-  public function sync(ResourceInterface $resource): void;
+  public function syncResource(ResourceInterface $resource): void;
 
 }

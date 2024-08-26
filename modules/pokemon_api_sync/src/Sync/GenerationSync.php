@@ -4,23 +4,23 @@ namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\pokemon_api\Endpoints;
 use Drupal\pokemon_api\PokeApi;
-use Drupal\pokemon_api\Resource\Ability;
+use Drupal\pokemon_api\Resource\Generation;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
- * Sync Pokemon Ability taxonomy.
+ * Sync Pokemon Generation taxonomy.
  */
-class AbilitySync extends SyncTermEntity {
+class GenerationSync extends SyncTermEntity {
 
   /**
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
-    $abilities = $this->pokeApi->getResources(Endpoints::ABILITY->value, $limit, $offset);
+    $generations = $this->pokeApi->getResources(Endpoints::GENERATION->value, $limit, $offset);
 
-    foreach ($abilities as $ability) {
-      $this->syncResource($ability);
+    foreach ($generations as $generation) {
+      $this->syncResource($generation);
     }
   }
 
@@ -28,19 +28,20 @@ class AbilitySync extends SyncTermEntity {
    * {@inheritdoc}
    */
   public function getVid(): string {
-    return 'pokemon_ability';
+    return 'pokemon_generation';
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getTranslatableFields(ResourceInterface $resource): array {
-    if (!$resource instanceof Ability) {
+    if (!$resource instanceof Generation) {
       return [];
     }
+
     return [
       'name' => $resource->getNames(),
-      'description' => $resource->getFlavorText(),
+      'field_pokeapi_id' => $resource->getId(),
     ];
   }
 

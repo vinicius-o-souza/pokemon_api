@@ -10,46 +10,44 @@ use Drupal\pokemon_api\Resource\ResourceInterface;
 interface PokeApiInterface {
 
   /**
-   * Retrieves all resources from the PokeAPI.
+   * The limit.
    *
-   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
-   *   The resource.
-   *
-   * @return \Drupal\pokemon_api\ResponseResourceIterator
-   *   The resource iterator.
-   *
-   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @var int
    */
-  public function getAllResources(ResourceInterface $resource): ResponseResourceIterator;
+  public const MAX_LIMIT = 100000;
 
   /**
    * Retrieves all resources from the PokeAPI.
    *
-   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
-   *   The resource.
+   * @param string $endpoint
+   *   The resource endpoint.
    * @param int $limit
-   *   Limit the number of items.
+   *   Maximum number of resources to retrieve. Default is the maximum limit.
    * @param int $offset
-   *   Offset the items.
+   *   The offset for pagination. Default is 0.
    *
-   * @return \Drupal\pokemon_api\ResponseResourceIterator
-   *   The resource iterator.
+   * @return array
+   *   The resources.
    *
-   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @throws \Drupal\pokemon_api\Exception\PokeApiException
+   *   If an error occurs.
    */
-  public function getResourcesPagination(ResourceInterface $resource, int $limit, int $offset = 0): ResponseResourceIterator;
+  public function getResources(string $endpoint, int $limit = self::MAX_LIMIT, int $offset = 0): array;
 
   /**
    * Retrieves a resource from the PokeAPI.
    *
-   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
-   *   The resource.
+   * @param string $endpoint
+   *   The resource endpoint.
+   * @param int $id
+   *   The resource id.
    *
    * @return \Drupal\pokemon_api\Resource\ResourceInterface
    *   The resource.
    *
-   * @throws \GuzzleHttp\Exception\GuzzleException
+   * @throws \Drupal\pokemon_api\Exception\PokeApiException
+   *   If an error occurs.
    */
-  public function getResource(ResourceInterface $resource): ResourceInterface;
+  public function getResource(string $endpoint, int $id): ResourceInterface;
 
 }

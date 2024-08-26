@@ -21,10 +21,10 @@ interface ResourceInterface {
    * @param array $data
    *   The data.
    *
-   * @return ResourceInterface
+   * @return self
    *   The resource.
    */
-  public static function createFromArray(array $data): ResourceInterface;
+  public static function createFromArray(array $data): self;
 
   /**
    * Get the field.
@@ -59,7 +59,7 @@ interface ResourceInterface {
    * @return int
    *   The id.
    */
-  public function getId(): ?int;
+  public function getId(): int;
 
   /**
    * Set the id.

@@ -4,6 +4,7 @@ namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api_sync\Sync\AbilitySync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
@@ -40,23 +41,24 @@ final class AbilitySyncCommands extends DrushCommands {
    * Command to synchronize pokemon abilities.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-ability', aliases: ['sync-ability'])]
+  #[CLI\Option(name: 'limit', description: 'Limit of abilities to sync.')]
+  #[CLI\Option(name: 'offset', description: 'Offset of abilities to sync.')]
   #[CLI\Usage(name: 'pokemon_api_sync:sync-ability', description: 'Usage description')]
-  public function syncAbility(): void {
-
+  public function syncAbility(array $options = ['limit' => PokeApi::MAX_LIMIT, 'offset' => 0]): void {
     $connection = $this->database->startTransaction();
-    try {
+    $this->logger()->log('notice', 'Synchronizing pokemon abilities...');
 
-      $this->abilitySync->syncAll();
+    try {
+      $this->abilitySync->sync($options['limit'], $options['offset']);
       if ($this->logger) {
-        $this->logger->info('Pokemon abilities synchronization successfully');
+        $this->logger()->log('success', 'Pokemon abilities synchronization successfully');
       }
     }
     catch (\Exception $e) {
-
       $connection->rollBack();
       if ($this->logger) {
-        $this->logger->error($this->t('Failed to synchronize pokemon abilities: @message', ['@message' => $e->getMessage()]));
-        $this->logger->error($this->t('Stack trace: @stack_trace', [
+        $this->logger()->log('error', $this->t('Failed to synchronize pokemon abilities: @message', ['@message' => $e->getMessage()]));
+        $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
           '@stack_trace' => $e->getTraceAsString(),
         ]));
       }

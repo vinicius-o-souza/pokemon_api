@@ -2,19 +2,14 @@
 
 namespace Drupal\pokemon_api\Resource;
 
+use Drupal\pokemon_api\Endpoints;
+
 /**
  * Resource Move class.
  */
 class Move extends TranslatableResource {
 
   use FlavorTextTrait;
-
-  /**
-   * The endpoint.
-   *
-   * @var string
-   */
-  private const ENDPOINT = 'move';
 
   /**
    * The percent value of how likely this move is to be successful.
@@ -65,14 +60,14 @@ class Move extends TranslatableResource {
    *   The endpoint.
    */
   public static function getEndpoint(): string {
-    return self::ENDPOINT;
+    return Endpoints::MOVE->value;
   }
 
   /**
    * {@inheritdoc}
    */
   public static function createFromArray(array $data): Move {
-    $move = new Move($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
+    $move = parent::createFromArray($data);
     $move->setNames($data['names'] ?? []);
     $move->setAccuracy($data['accuracy'] ?? 0);
     $move->setEffectChance($data['effect_chance'] ?? 0);
@@ -82,7 +77,7 @@ class Move extends TranslatableResource {
     $move->setFlavorText($data['flavor_text_entries'] ?? []);
 
     if (isset($data['type'])) {
-      $type = new Type($data['type']['name'], $data['type']['url'] ?? NULL, $data['type']['id'] ?? NULL);
+      $type = Type::createFromArray($data['type']);
       $move->setType($type);
     }
 

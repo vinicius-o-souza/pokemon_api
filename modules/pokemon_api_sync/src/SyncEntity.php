@@ -11,7 +11,7 @@ use Drupal\pokemon_api\Translation;
 /**
  * Class Entity.
  */
-abstract class SyncEntity implements SyncEntityInterface {
+abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
 
   /**
    * Constructs a SyncEntity object.
@@ -48,22 +48,6 @@ abstract class SyncEntity implements SyncEntityInterface {
 
       return NULL;
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function readEntity($id): ?ContentEntityBase {
-    $entities = $this->getStorageClass()->loadByProperties([
-      'field_pokeapi_id' => $id,
-    ]);
-
-    $entity = array_shift($entities);
-    if ($entity instanceof ContentEntityBase) {
-      return $entity;
-    }
-
-    return NULL;
   }
 
   /**

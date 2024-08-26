@@ -2,17 +2,12 @@
 
 namespace Drupal\pokemon_api\Resource;
 
+use Drupal\pokemon_api\Endpoints;
+
 /**
  * Resource Generation class.
  */
 class Generation extends TranslatableResource {
-
-  /**
-   * The endpoint.
-   *
-   * @var string
-   */
-  private const ENDPOINT = 'generation';
 
   /**
    * Get the endpoint.
@@ -21,17 +16,7 @@ class Generation extends TranslatableResource {
    *   The endpoint.
    */
   public static function getEndpoint(): string {
-    return self::ENDPOINT;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function createFromArray(array $data): Generation {
-    $generation = new Generation($data['name'], $data['url'] ?? NULL, $data['id'] ?? NULL);
-    $generation->setNames($data['names'] ?? []);
-
-    return $generation;
+    return Endpoints::GENERATION->value;
   }
 
 }
