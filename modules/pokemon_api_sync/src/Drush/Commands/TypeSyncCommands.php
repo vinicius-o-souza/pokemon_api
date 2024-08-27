@@ -50,18 +50,14 @@ final class TypeSyncCommands extends DrushCommands {
 
     try {
       $this->typeSync->sync($options['limit'], $options['offset']);
-      if ($this->logger) {
-        $this->logger()->log('success', 'Pokemon types synchronization successfully');
-      }
+      $this->logger()->log('success', 'Pokemon types synchronization successfully');
     }
     catch (\Exception $e) {
       $connection->rollBack();
-      if ($this->logger) {
-        $this->logger()->log('error', $this->t('Failed to synchronize pokemon types: @message', ['@message' => $e->getMessage()]));
-        $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-          '@stack_trace' => $e->getTraceAsString(),
-        ]));
-      }
+      $this->logger()->log('error', $this->t('Failed to synchronize pokemon types: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
+        '@stack_trace' => $e->getTraceAsString(),
+      ]));
 
     }
   }

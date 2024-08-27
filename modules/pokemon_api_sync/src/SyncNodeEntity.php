@@ -64,14 +64,12 @@ abstract class SyncNodeEntity extends SyncEntity {
   /**
    * Syncs a node with the provided resource.
    *
-   * @param ResourceInterface $resource
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   The resource to sync with.
    * @param ?ContentEntityBase $node
    *   The node to sync.
-   *
-   * @return void
    */
-  public function syncNode(ResourceInterface $resource, ContentEntityBase $node = NULL) {
+  public function syncNode(ResourceInterface $resource, ContentEntityBase $node = NULL): void {
     $data = $this->getDataFields($resource, $node);
 
     if ($node) {

@@ -5,7 +5,6 @@ namespace Drupal\pokemon_api_sync;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\pokemon_api\Resource\ResourceInterface;
-use Drupal\taxonomy\Entity\Term;
 
 /**
  * Sync taxonomy term entity.
@@ -63,12 +62,10 @@ abstract class SyncTermEntity extends SyncEntity {
   /**
    * Syncs a term with the provided resource.
    *
-   * @param ResourceInterface $resource
+   * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   The resource to sync with.
    * @param ?ContentEntityBase $term
    *   The term to sync.
-   *
-   * @return void
    */
   public function syncTerm(ResourceInterface $resource, ContentEntityBase $term = NULL): void {
     $data = $this->getDataFields($resource);

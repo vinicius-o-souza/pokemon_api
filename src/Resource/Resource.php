@@ -87,27 +87,16 @@ abstract class Resource implements ResourceInterface {
   /**
    * {@inheritdoc}
    */
-  public static function createFromArray(array $data): self {
+  public static function createFromArray(array $data): static {
     if (empty($data['url'])) {
       if (empty($data['id'])) {
-        throw new \InvalidArgumentException('Missing required "url" or "id" key in data.'); 
+        throw new \InvalidArgumentException('Missing required "url" or "id" key in data.');
       }
 
       $data['url'] = $data['id'];
     }
 
-    $resorce = new static($data['url'], $data['name'] ?? '');
-
-    foreach ($data as $key => $value) {
-      // Convert snake_case to camelCase.
-      $key = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
-      $setter = 'set' . ucfirst($key);
-      if (method_exists($resorce, $setter) && !empty($value)) {
-        $resorce->$setter($value);
-      }
-    }
-
-    return $resorce;
+    return new static($data['url'], $data['name'] ?? '');
   }
 
   /**

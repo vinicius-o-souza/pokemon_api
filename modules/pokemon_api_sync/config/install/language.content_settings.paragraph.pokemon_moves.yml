@@ -1,20 +1,18 @@
-uuid: 2826c5c1-abd0-411f-945b-eef55b242b46
+uuid: 1e43db6b-20ea-4161-bbaf-154a13367d6b
 langcode: en
 status: true
 dependencies:
   config:
-    - node.type.pokemon
+    - paragraphs.paragraphs_type.pokemon_moves
   module:
     - content_translation
 third_party_settings:
   content_translation:
-    enabled: true
+    enabled: false
     bundle_settings:
       untranslatable_fields_hide: '0'
-_core:
-  default_config_hash: ryOPqfMc6GU9k1qa-cXyefa-jXvrkfl5VaFMm0N4vUg
-id: node.pokemon
-target_entity_type_id: node
-target_bundle: pokemon
+id: paragraph.pokemon_moves
+target_entity_type_id: paragraph
+target_bundle: pokemon_moves
 default_langcode: site_default
 language_alterable: false

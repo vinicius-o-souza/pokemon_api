@@ -6,7 +6,6 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\pokemon_api\Endpoints;
 use Drupal\pokemon_api\PokeApi;
 use Drupal\pokemon_api\Resource\EvolutionChain;
-use Drupal\pokemon_api\Resource\Pokemon;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncNodeEntity;
 
@@ -46,7 +45,7 @@ class EvolutionSync extends SyncNodeEntity {
     }
 
     $evolutions = [];
-    foreach ($resource->getEvolution() as $pokemonId => $pokemonName) {
+    foreach ($resource->getEvolution() as $pokemonId) {
       $pokemon = $this->readEntityByPokeId($pokemonId);
       $evolutions[] = $pokemon->id();
     }

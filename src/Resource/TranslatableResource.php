@@ -19,6 +19,16 @@ abstract class TranslatableResource extends Resource implements TranslatableReso
   /**
    * {@inheritdoc}
    */
+  public static function createFromArray(array $data): static {
+    $resource = parent::createFromArray($data);
+    $resource->setNames($data['names'] ?? []);
+
+    return $resource;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getNames(): ?Translation {
     return $this->names;
   }

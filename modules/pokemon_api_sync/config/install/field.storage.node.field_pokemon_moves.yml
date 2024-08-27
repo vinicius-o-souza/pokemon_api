@@ -1,17 +1,18 @@
-uuid: 0de72a71-d24e-4edf-8694-662e30c382a9
+uuid: b56dc338-defd-434e-b80c-706ffdd6fa41
 langcode: en
 status: true
 dependencies:
   module:
+    - entity_reference_revisions
     - node
-    - taxonomy
+    - paragraphs
 id: node.field_pokemon_moves
 field_name: field_pokemon_moves
 entity_type: node
-type: entity_reference
+type: entity_reference_revisions
 settings:
-  target_type: taxonomy_term
-module: core
+  target_type: paragraph
+module: entity_reference_revisions
 locked: false
 cardinality: -1
 translatable: true

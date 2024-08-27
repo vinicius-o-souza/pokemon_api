@@ -24,7 +24,7 @@ class Ability extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public static function createFromArray(array $data): Ability {
+  public static function createFromArray(array $data): static {
     $ability = parent::createFromArray($data);
     $ability->setNames($data['names'] ?? []);
     $ability->setFlavorText($data['flavor_text_entries'] ?? []);

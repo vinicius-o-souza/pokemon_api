@@ -50,18 +50,14 @@ final class EvolutionSyncCommands extends DrushCommands {
 
     try {
       $this->evolutionSync->sync($options['limit'], $options['offset']);
-      if ($this->logger) {
-        $this->logger()->log('success', 'Pokemon evolutions synchronization successfully');
-      }
+      $this->logger()->log('success', 'Pokemon evolutions synchronization successfully');
     }
     catch (\Exception $e) {
       $connection->rollBack();
-      if ($this->logger) {
-        $this->logger()->log('error', $this->t('Failed to synchronize pokemon evolutions: @message', ['@message' => $e->getMessage()]));
-        $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-          '@stack_trace' => $e->getTraceAsString(),
-        ]));
-      }
+      $this->logger()->log('error', $this->t('Failed to synchronize pokemon evolutions: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
+        '@stack_trace' => $e->getTraceAsString(),
+      ]));
 
     }
   }

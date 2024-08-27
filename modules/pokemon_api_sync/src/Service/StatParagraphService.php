@@ -62,8 +62,8 @@ class StatParagraphService {
     }
 
     foreach ($pokemonStats as $key => $stat) {
-      if ($this->statTerms['pokemon_stat'][$key]) {
-        $stats[] = $this->createStatParagraph($this->statTerms['pokemon_stat'][$key], $stat);
+      if ($this->statTerms[$key]) {
+        $stats[] = $this->createStatParagraph($this->statTerms[$key], $stat);
       }
     }
 
