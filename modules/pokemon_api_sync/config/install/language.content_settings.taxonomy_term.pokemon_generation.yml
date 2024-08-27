@@ -1,9 +1,9 @@
-uuid: 89a7c01d-4995-474b-85ec-2ab747e4dcbd
+uuid: ebe76db4-2cd6-48d8-a57a-01bd2f4c47b0
 langcode: en
 status: true
 dependencies:
   config:
-    - taxonomy.vocabulary.pokemon_stat
+    - taxonomy.vocabulary.pokemon_generation
   module:
     - content_translation
 third_party_settings:
@@ -11,8 +11,8 @@ third_party_settings:
     enabled: true
     bundle_settings:
       untranslatable_fields_hide: '0'
-id: taxonomy_term.pokemon_stat
+id: taxonomy_term.pokemon_generation
 target_entity_type_id: taxonomy_term
-target_bundle: pokemon_stat
+target_bundle: pokemon_generation
 default_langcode: site_default
-language_alterable: true
+language_alterable: false

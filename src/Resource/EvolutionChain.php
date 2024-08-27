@@ -29,7 +29,7 @@ class EvolutionChain extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public static function createFromArray(array $data): EvolutionChain {
+  public static function createFromArray(array $data): static {
     $evolutionChain = parent::createFromArray($data);
     $evolutionChain->setEvolution($data['chain'] ?? []);
 

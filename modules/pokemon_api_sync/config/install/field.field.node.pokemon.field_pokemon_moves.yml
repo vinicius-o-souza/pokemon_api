@@ -1,11 +1,13 @@
-uuid: 33dfcedf-a366-4eb5-a1af-2af21121fe15
+uuid: bf53ade5-46b9-48eb-a065-c2e9a6ec593f
 langcode: en
 status: true
 dependencies:
   config:
     - field.storage.node.field_pokemon_moves
     - node.type.pokemon
-    - taxonomy.vocabulary.pokemon_move
+    - paragraphs.paragraphs_type.pokemon_moves
+  module:
+    - entity_reference_revisions
 id: node.pokemon.field_pokemon_moves
 field_name: field_pokemon_moves
 entity_type: node
@@ -17,13 +19,16 @@ translatable: false
 default_value: {  }
 default_value_callback: ''
 settings:
-  handler: 'default:taxonomy_term'
+  handler: 'default:paragraph'
   handler_settings:
     target_bundles:
-      pokemon_move: pokemon_move
-    sort:
-      field: name
-      direction: asc
-    auto_create: false
-    auto_create_bundle: ''
-field_type: entity_reference
+      pokemon_moves: pokemon_moves
+    negate: 0
+    target_bundles_drag_drop:
+      pokemon_moves:
+        weight: 3
+        enabled: true
+      pokemon_stats:
+        weight: 4
+        enabled: false
+field_type: entity_reference_revisions

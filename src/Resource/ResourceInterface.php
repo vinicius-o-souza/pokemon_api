@@ -21,10 +21,10 @@ interface ResourceInterface {
    * @param array $data
    *   The data.
    *
-   * @return self
+   * @return static
    *   The resource.
    */
-  public static function createFromArray(array $data): self;
+  public static function createFromArray(array $data): static;
 
   /**
    * Get the field.

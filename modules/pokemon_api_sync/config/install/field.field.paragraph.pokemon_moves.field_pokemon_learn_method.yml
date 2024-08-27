@@ -1,0 +1,21 @@
+uuid: e105cfc8-9dab-40a2-87a7-221459eb9f96
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_pokemon_learn_method
+    - paragraphs.paragraphs_type.pokemon_moves
+  module:
+    - options
+id: paragraph.pokemon_moves.field_pokemon_learn_method
+field_name: field_pokemon_learn_method
+entity_type: paragraph
+bundle: pokemon_moves
+label: 'Learn Method'
+description: 'Methods by which Pokémon can learn moves.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

@@ -43,19 +43,11 @@ class PokemonSpecies extends Resource {
   /**
    * {@inheritdoc}
    */
-  public static function createFromArray(array $data): PokemonSpecies {
-    if (empty($data['url'])) {
-      if (empty($data['id'])) {
-        throw new \InvalidArgumentException('Missing required "url" or "id" key in data.'); 
-      }
-
-      $data['url'] = $data['id'];
-    }
-
-    $pokemonSpecies = new self($data['url'], $data['name'] ?? '');
+  public static function createFromArray(array $data): static {
+    $pokemonSpecies = parent::createFromArray($data);
     $pokemonSpecies->setIsLegendary($data['is_legendary'] ?? []);
     $pokemonSpecies->setIsMythical($data['is_mythical'] ?? []);
-    
+
     if (isset($data['generation'])) {
       $generation = Generation::createFromArray($data['generation']);
       $pokemonSpecies->setGeneration($generation);

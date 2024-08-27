@@ -50,18 +50,14 @@ final class StatSyncCommands extends DrushCommands {
 
     try {
       $this->statSync->sync($options['limit'], $options['offset']);
-      if ($this->logger) {
-        $this->logger()->log('success', 'Pokemon stats synchronization successfully');
-      }
+      $this->logger()->log('success', 'Pokemon stats synchronization successfully');
     }
     catch (\Exception $e) {
       $connection->rollBack();
-      if ($this->logger) {
-        $this->logger()->log('error', $this->t('Failed to synchronize pokemon stats: @message', ['@message' => $e->getMessage()]));
-        $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-          '@stack_trace' => $e->getTraceAsString(),
-        ]));
-      }
+      $this->logger()->log('error', $this->t('Failed to synchronize pokemon stats: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
+        '@stack_trace' => $e->getTraceAsString(),
+      ]));
 
     }
   }

@@ -66,9 +66,8 @@ class Move extends TranslatableResource {
   /**
    * {@inheritdoc}
    */
-  public static function createFromArray(array $data): Move {
+  public static function createFromArray(array $data): static {
     $move = parent::createFromArray($data);
-    $move->setNames($data['names'] ?? []);
     $move->setAccuracy($data['accuracy'] ?? 0);
     $move->setEffectChance($data['effect_chance'] ?? 0);
     $move->setPower($data['power'] ?? 0);

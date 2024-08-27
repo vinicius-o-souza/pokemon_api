@@ -83,6 +83,23 @@ class Pokemon extends Resource {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public static function createFromArray(array $data): static {
+    $pokemon = parent::createFromArray($data);
+    $pokemon->setBaseExperience($data['base_experience'] ?? 0);
+    $pokemon->setHeight($data['height'] ?? 0.0);
+    $pokemon->setOrder($data['order']);
+    $pokemon->setWeight($data['weight'] ?? 0.0);
+    $pokemon->setAbilities($data['abilities']);
+    $pokemon->setMoves($data['moves']);
+    $pokemon->setStats($data['stats']);
+    $pokemon->setTypes($data['types']);
+
+    return $pokemon;
+  }
+
+  /**
    * Get the base experience gained for defeating this Pokemon.
    *
    * @return int

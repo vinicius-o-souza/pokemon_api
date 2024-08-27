@@ -1,20 +1,18 @@
-uuid: 2826c5c1-abd0-411f-945b-eef55b242b46
+uuid: 398a52e3-b927-479d-831a-86919a42398b
 langcode: en
 status: true
 dependencies:
   config:
-    - node.type.pokemon
+    - paragraphs.paragraphs_type.pokemon_stats
   module:
     - content_translation
 third_party_settings:
   content_translation:
-    enabled: true
+    enabled: false
     bundle_settings:
       untranslatable_fields_hide: '0'
-_core:
-  default_config_hash: ryOPqfMc6GU9k1qa-cXyefa-jXvrkfl5VaFMm0N4vUg
-id: node.pokemon
-target_entity_type_id: node
-target_bundle: pokemon
+id: paragraph.pokemon_stats
+target_entity_type_id: paragraph
+target_bundle: pokemon_stats
 default_langcode: site_default
 language_alterable: false

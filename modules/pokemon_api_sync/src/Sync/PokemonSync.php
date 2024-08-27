@@ -26,12 +26,14 @@ class PokemonSync extends SyncNodeEntity {
    *   The logger.
    * @param \Drupal\pokemon_api\PokeApi $pokeApi
    *   The PokeApi.
+   * @param \Drupal\pokemon_api_sync\Service\PokemonService $pokemonService
+   *   The pokemon service.
    */
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly LoggerChannelInterface $logger,
     protected readonly PokeApi $pokeApi,
-    protected readonly PokemonService $pokemonService
+    protected readonly PokemonService $pokemonService,
   ) {}
 
   /**
@@ -88,7 +90,7 @@ class PokemonSync extends SyncNodeEntity {
       'field_pokemon_order' => $resource->getOrder(),
       'field_pokemon_weight' => $resource->getWeight(),
       'field_pokemon_abilities' => $abilites,
-      'field_pokemon_moves' => $paragraphs['moves'],
+      // 'field_pokemon_moves' => $paragraphs['moves'],
       'field_pokemon_stats' => $paragraphs['stats'],
       'field_pokemon_types' => $types,
     ];
