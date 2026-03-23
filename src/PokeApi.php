@@ -34,7 +34,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   public function __construct(ClientInterface $client, ConfigFactoryInterface $config) {
     parent::__construct($client);
 
-    $pokemonApiUrl = $config->get('pokemon_api.settings')->get('pokemon_api_url');
+    $pokemonApiUrl = $config->get('pokemon_api.settings')->get('base_url');
     if (empty($pokemonApiUrl)) {
       throw new PokeApiException('Pokemon API URL not configured.');
     }

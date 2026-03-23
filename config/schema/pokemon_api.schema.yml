@@ -3,6 +3,6 @@ pokemon_api.settings:
   type: config_object
   label: 'Pokemon API settings'
   mapping:
-    pokemon_api_url:
+    base_url:
       type: url
-      label: 'Pokemon API Url'
+      label: 'Poke API Url'
