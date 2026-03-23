@@ -1,0 +1,24 @@
+uuid: 577d5516-06f7-4894-ada4-bb7c375a4586
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_description
+    - filter.format.plain_text
+    - node.type.pokemon
+  module:
+    - text
+id: node.pokemon.field_description
+field_name: field_description
+entity_type: node
+bundle: pokemon
+label: Description
+description: ''
+required: true
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - plain_text
+field_type: text_long
