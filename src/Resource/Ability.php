@@ -7,7 +7,7 @@ namespace Drupal\pokemon_api\Resource;
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Ability resource.
+ * Represents a Pokémon ability from the PokeAPI.
  */
 class Ability extends TranslatableResource {
 
@@ -17,7 +17,7 @@ class Ability extends TranslatableResource {
    * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::ABILITY->value;
+    return Endpoints::Ability->value;
   }
 
   /**

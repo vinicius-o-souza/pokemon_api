@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api_sync\Sync\EvolutionSync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sync Pokemon Evolution.
+ * Drush commands for syncing Pokémon evolutions.
  */
 final class EvolutionSyncCommands extends DrushCommands {
 
   use StringTranslationTrait;
 
   /**
-   * Constructs a EvolutionSyncCommands object.
+   * Constructs an EvolutionSyncCommands object.
    */
   public function __construct(
     private readonly Connection $database,
@@ -38,27 +40,24 @@ final class EvolutionSyncCommands extends DrushCommands {
   }
 
   /**
-   * Command to synchronize pokemon evolution.
+   * Synchronizes Pokémon evolutions from PokeAPI.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-evolution', aliases: ['sync-evolution'])]
   #[CLI\Option(name: 'limit', description: 'Limit of evolutions to sync.')]
   #[CLI\Option(name: 'offset', description: 'Offset of evolutions to sync.')]
-  #[CLI\Usage(name: 'pokemon_api_sync:sync-evolution', description: 'Command to synchronize pokemon evolutions.')]
-  public function sync(array $options = ['limit' => PokeApi::MAX_LIMIT, 'offset' => 0]): void {
-    $connection = $this->database->startTransaction();
-    $this->logger()->log('notice', 'Synchronizing pokemon evolutions...');
+  #[CLI\Usage(name: 'pokemon_api_sync:sync-evolution', description: 'Sync all Pokémon evolutions.')]
+  public function sync(array $options = ['limit' => PokeApiInterface::MAX_LIMIT, 'offset' => 0]): void {
+    $transaction = $this->database->startTransaction();
+    $this->logger()->log('notice', 'Synchronizing Pokémon evolutions...');
 
     try {
       $this->evolutionSync->sync($options['limit'], $options['offset']);
-      $this->logger()->log('success', 'Pokemon evolutions synchronization successfully');
+      $this->logger()->log('success', 'Pokémon evolutions synchronization completed successfully.');
     }
     catch (\Exception $e) {
-      $connection->rollBack();
-      $this->logger()->log('error', $this->t('Failed to synchronize pokemon evolutions: @message', ['@message' => $e->getMessage()]));
-      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-        '@stack_trace' => $e->getTraceAsString(),
-      ]));
-
+      $transaction->rollBack();
+      $this->logger()->log('error', $this->t('Failed to synchronize Pokémon evolutions: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @trace', ['@trace' => $e->getTraceAsString()]));
     }
   }
 

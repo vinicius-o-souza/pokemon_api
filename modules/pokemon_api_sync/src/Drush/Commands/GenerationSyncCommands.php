@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api_sync\Sync\GenerationSync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sync Pokemon Generation taxonomy.
+ * Drush commands for syncing Pokémon generations.
  */
 final class GenerationSyncCommands extends DrushCommands {
 
@@ -38,27 +40,24 @@ final class GenerationSyncCommands extends DrushCommands {
   }
 
   /**
-   * Command to synchronize pokemon generation.
+   * Synchronizes Pokémon generations from PokeAPI.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-generation', aliases: ['sync-generation'])]
   #[CLI\Option(name: 'limit', description: 'Limit of generations to sync.')]
   #[CLI\Option(name: 'offset', description: 'Offset of generations to sync.')]
-  #[CLI\Usage(name: 'pokemon_api_sync:sync-generation', description: 'Command to synchronize pokemon generations.')]
-  public function sync(array $options = ['limit' => PokeApi::MAX_LIMIT, 'offset' => 0]): void {
-    $connection = $this->database->startTransaction();
-    $this->logger()->log('notice', 'Synchronizing pokemon generations...');
+  #[CLI\Usage(name: 'pokemon_api_sync:sync-generation', description: 'Sync all Pokémon generations.')]
+  public function sync(array $options = ['limit' => PokeApiInterface::MAX_LIMIT, 'offset' => 0]): void {
+    $transaction = $this->database->startTransaction();
+    $this->logger()->log('notice', 'Synchronizing Pokémon generations...');
 
     try {
       $this->generationSync->sync($options['limit'], $options['offset']);
-      $this->logger()->log('success', 'Pokemon generations synchronization successfully');
+      $this->logger()->log('success', 'Pokémon generations synchronization completed successfully.');
     }
     catch (\Exception $e) {
-      $connection->rollBack();
-      $this->logger()->log('error', $this->t('Failed to synchronize pokemon generations: @message', ['@message' => $e->getMessage()]));
-      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-        '@stack_trace' => $e->getTraceAsString(),
-      ]));
-
+      $transaction->rollBack();
+      $this->logger()->log('error', $this->t('Failed to synchronize Pokémon generations: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @trace', ['@trace' => $e->getTraceAsString()]));
     }
   }
 

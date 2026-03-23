@@ -22,7 +22,7 @@ class EvolutionChain extends TranslatableResource {
    * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::EVOLUTION_CHAIN->value;
+    return Endpoints::EvolutionChain->value;
   }
 
   /**

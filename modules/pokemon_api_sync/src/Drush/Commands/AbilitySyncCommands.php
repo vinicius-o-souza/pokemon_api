@@ -1,24 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api_sync\Sync\AbilitySync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sync Pokemon Ability taxonomy.
+ * Drush commands for syncing Pokémon abilities.
  */
 final class AbilitySyncCommands extends DrushCommands {
 
   use StringTranslationTrait;
 
   /**
-   * Constructs a AbilitySyncCommands object.
+   * Constructs an AbilitySyncCommands object.
    */
   public function __construct(
     private readonly Connection $database,
@@ -38,27 +40,24 @@ final class AbilitySyncCommands extends DrushCommands {
   }
 
   /**
-   * Command to synchronize pokemon abilities.
+   * Synchronizes Pokémon abilities from PokeAPI.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-ability', aliases: ['sync-ability'])]
   #[CLI\Option(name: 'limit', description: 'Limit of abilities to sync.')]
   #[CLI\Option(name: 'offset', description: 'Offset of abilities to sync.')]
-  #[CLI\Usage(name: 'pokemon_api_sync:sync-ability', description: 'Usage description')]
-  public function syncAbility(array $options = ['limit' => PokeApi::MAX_LIMIT, 'offset' => 0]): void {
-    $connection = $this->database->startTransaction();
-    $this->logger()->log('notice', 'Synchronizing pokemon abilities...');
+  #[CLI\Usage(name: 'pokemon_api_sync:sync-ability', description: 'Sync all Pokémon abilities.')]
+  public function syncAbility(array $options = ['limit' => PokeApiInterface::MAX_LIMIT, 'offset' => 0]): void {
+    $transaction = $this->database->startTransaction();
+    $this->logger()->log('notice', 'Synchronizing Pokémon abilities...');
 
     try {
       $this->abilitySync->sync($options['limit'], $options['offset']);
-      $this->logger()->log('success', 'Pokemon abilities synchronization successfully');
+      $this->logger()->log('success', 'Pokémon abilities synchronization completed successfully.');
     }
     catch (\Exception $e) {
-      $connection->rollBack();
-      $this->logger()->log('error', $this->t('Failed to synchronize pokemon abilities: @message', ['@message' => $e->getMessage()]));
-      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-        '@stack_trace' => $e->getTraceAsString(),
-      ]));
-
+      $transaction->rollBack();
+      $this->logger()->log('error', $this->t('Failed to synchronize Pokémon abilities: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @trace', ['@trace' => $e->getTraceAsString()]));
     }
   }
 

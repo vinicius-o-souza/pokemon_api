@@ -1,85 +1,74 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource Pokemon class.
+ * Represents a Pokémon from the PokeAPI.
  */
 class Pokemon extends Resource {
 
   /**
-   * Order maximum.
-   *
-   * @var int
+   * Maximum order value for negative-order Pokémon.
    */
-  private const ORDER_MAXIMUM = 10000;
+  private const int ORDER_MAXIMUM = 10000;
 
   /**
    * The base experience gained for defeating this Pokémon.
-   *
-   * @var int
    */
   private int $baseExperience = 0;
 
   /**
-   * The height of this Pokémon in decimetres.
-   *
-   * @var float
+   * The height in decimetres (converted to metres).
    */
   private float $height = 0.0;
 
   /**
-   * Order for sorting. Almost national order.
-   *
-   * @var int
+   * Sort order (almost national order).
    */
   private int $order;
 
   /**
-   * The weight of this Pokémon in hectograms.
-   *
-   * @var float
+   * The weight in hectograms (converted to kilograms).
    */
   private float $weight = 0.0;
 
   /**
-   * A list of abilities this Pokémon could potentially have.
+   * Abilities keyed by PokeAPI ID.
    *
-   * @var array
+   * @var array<int, string>
    */
   private array $abilities;
 
   /**
-   * A list of moves along with learn methods and level details pertaining.
+   * Moves keyed by PokeAPI ID.
    *
-   * @var array
+   * @var array<int, string>
    */
   private array $moves;
 
   /**
-   * A list of base stat values for this Pokémon.
+   * Base stats keyed by PokeAPI ID.
    *
-   * @var array
+   * @var array<int, int>
    */
   private array $stats;
 
   /**
-   * A list of details showing types this Pokémon has.
+   * Types keyed by PokeAPI ID.
    *
-   * @var array
+   * @var array<int, string>
    */
   private array $types;
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::POKEMON->value;
+    return Endpoints::Pokemon->value;
   }
 
   /**
@@ -100,179 +89,143 @@ class Pokemon extends Resource {
   }
 
   /**
-   * Get the base experience gained for defeating this Pokemon.
-   *
-   * @return int
-   *   The base experience gained for defeating this Pokemon.
+   * Gets the base experience.
    */
   public function getBaseExperience(): int {
     return $this->baseExperience;
   }
 
   /**
-   * Set the base experience gained for defeating this Pokemon.
-   *
-   * @param int $baseExperience
-   *   The base experience gained for defeating this Pokemon.
+   * Sets the base experience.
    */
   public function setBaseExperience(int $baseExperience): void {
     $this->baseExperience = $baseExperience;
   }
 
   /**
-   * Get the height of this Pokemon in decimetres.
-   *
-   * @return float
-   *   The height of this Pokemon in decimetres.
+   * Gets the height in metres.
    */
   public function getHeight(): float {
     return $this->height;
   }
 
   /**
-   * Set the height of this Pokemon in decimetres.
-   *
-   * @param float $height
-   *   The height of this Pokemon in decimetres.
+   * Sets the height, converting from decimetres to metres.
    */
   public function setHeight(float $height): void {
     $this->height = $height / 10;
   }
 
   /**
-   * Get the order for sorting. Almost national order.
-   *
-   * @return int
-   *   The order for sorting. Almost national order.
+   * Gets the sort order.
    */
   public function getOrder(): int {
     return $this->order;
   }
 
   /**
-   * Set the order for sorting. Almost national order.
-   *
-   * @param int $order
-   *   The order for sorting. Almost national order.
+   * Sets the sort order, normalising negative values.
    */
   public function setOrder(int $order): void {
     $this->order = $order < 0 ? self::ORDER_MAXIMUM + $order : $order;
   }
 
   /**
-   * Get the weight of this Pokemon in hectograms.
-   *
-   * @return float
-   *   The weight of this Pokemon in hectograms.
+   * Gets the weight in kilograms.
    */
   public function getWeight(): float {
     return $this->weight;
   }
 
   /**
-   * Set the weight of this Pokemon in hectograms.
-   *
-   * @param float $weight
-   *   The weight of this Pokemon in hectograms.
+   * Sets the weight, converting from hectograms to kilograms.
    */
   public function setWeight(float $weight): void {
     $this->weight = $weight / 10;
   }
 
   /**
-   * Get the abilities.
+   * Gets the abilities.
    *
-   * @return array
-   *   The abilities.
+   * @return array<int, string>
+   *   Abilities keyed by PokeAPI ID.
    */
   public function getAbilities(): array {
     return $this->abilities;
   }
 
   /**
-   * Set the abilities.
-   *
-   * @param array $abilities
-   *   The abilities.
+   * Sets the abilities from raw API data.
    */
   public function setAbilities(array $abilities): void {
-    $pokemonAbilities = [];
+    $this->abilities = [];
     foreach ($abilities as $ability) {
-      $pokemonAbilities[self::extractIdFromUrl($ability['ability']['url'])] = $ability['ability']['name'];
+      $id = self::extractIdFromUrl($ability['ability']['url']);
+      $this->abilities[$id] = $ability['ability']['name'];
     }
-    $this->abilities = $pokemonAbilities;
   }
 
   /**
-   * Get the moves.
+   * Gets the moves.
    *
-   * @return array
-   *   The moves.
+   * @return array<int, string>
+   *   Moves keyed by PokeAPI ID.
    */
   public function getMoves(): array {
     return $this->moves;
   }
 
   /**
-   * Set the moves.
-   *
-   * @param array $moves
-   *   The moves.
+   * Sets the moves from raw API data.
    */
   public function setMoves(array $moves): void {
-    $pokemonMoves = [];
+    $this->moves = [];
     foreach ($moves as $move) {
-      $pokemonMoves[self::extractIdFromUrl($move['move']['url'])] = $move['move']['name'];
+      $id = self::extractIdFromUrl($move['move']['url']);
+      $this->moves[$id] = $move['move']['name'];
     }
-    $this->moves = $pokemonMoves;
   }
 
   /**
-   * Get the stats.
+   * Gets the base stats.
    *
-   * @return array
-   *   The stats.
+   * @return array<int, int>
+   *   Stats keyed by PokeAPI ID.
    */
   public function getStats(): array {
     return $this->stats;
   }
 
   /**
-   * Set the stats.
-   *
-   * @param array $stats
-   *   The stats.
+   * Sets the stats from raw API data.
    */
   public function setStats(array $stats): void {
-    $pokemonStats = [];
+    $this->stats = [];
     foreach ($stats as $stat) {
-      $pokemonStats[self::extractIdFromUrl($stat['stat']['url'])] = $stat['base_stat'];
+      $id = self::extractIdFromUrl($stat['stat']['url']);
+      $this->stats[$id] = $stat['base_stat'];
     }
-    $this->stats = $pokemonStats;
   }
 
   /**
-   * Get the types.
+   * Gets the types.
    *
-   * @return array
-   *   The types.
+   * @return array<int, string>
+   *   Types keyed by PokeAPI ID.
    */
   public function getTypes(): array {
     return $this->types;
   }
 
   /**
-   * Set the types.
-   *
-   * @param array $types
-   *   The types.
+   * Sets the types from raw API data.
    */
   public function setTypes(array $types): void {
-    $pokemonTypes = [];
+    $this->types = [];
     foreach ($types as $type) {
-      $pokemonTypes[self::extractIdFromUrl($type['type']['url'])] = $type['type']['name'];
+      $id = self::extractIdFromUrl($type['type']['url']);
+      $this->types[$id] = $type['type']['name'];
     }
-    $this->types = $pokemonTypes;
   }
 
 }

@@ -7,7 +7,7 @@ namespace Drupal\pokemon_api\Resource;
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Stat resource.
+ * Represents a Pokémon stat from the PokeAPI.
  */
 class Stat extends TranslatableResource {
 
@@ -15,7 +15,7 @@ class Stat extends TranslatableResource {
    * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::STAT->value;
+    return Endpoints::Stat->value;
   }
 
 }

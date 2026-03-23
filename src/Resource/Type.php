@@ -7,7 +7,7 @@ namespace Drupal\pokemon_api\Resource;
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Type resource.
+ * Represents a Pokémon type from the PokeAPI.
  */
 class Type extends TranslatableResource {
 
@@ -15,7 +15,7 @@ class Type extends TranslatableResource {
    * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::TYPE->value;
+    return Endpoints::Type->value;
   }
 
 }
