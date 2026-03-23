@@ -19,7 +19,6 @@
 /sites/*
 /recipes/*
 /profiles/*
-/modules/*
 /themes/*
 
 # PHPMetrics
