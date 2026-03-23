@@ -1,684 +1,187 @@
-# pokemon_api module - Agent Rules
+# CLAUDE.md — `pokemon_api` Project
 
-This document contains coding rules and conventions for pokemon api Drupal module that AI agents should follow when making changes.
+**For AI agents only.**
 
----
+This file covers the architecture, responsibilities, data contracts, and guardrails specific to the `pokemon_api` and `pokemon_api_sync` modules. Read this before touching any file in either module.
 
-## General Principles
-
-### Follow Drupal Coding Standards
-
-**Rule**: All PHP code must comply with [Drupal coding standards](https://www.drupal.org/docs/develop/standards).
-
-- 2-space indentation (no tabs)
-- Opening braces on the same line for control structures, new line for classes/functions
-- Single blank line between methods
-- DocBlocks on all classes, methods, and hooks
-
-**✅ Good:**
-
-```php
-<?php
-
-namespace Drupal\deploya_pokemon\Service;
-
-/**
- * Syncs Pokémon data from the PokeAPI.
- */
-class PokemonSyncService {
-
-  /**
-   * Syncs a single Pokémon by its Pokédex number.
-   *
-   * @param int $id
-   *   The Pokédex number.
-   *
-   * @return bool
-   *   TRUE on success, FALSE on failure.
-   */
-  public function syncById(int $id): bool {
-    // Implementation.
-  }
-
-}
-```
-
-### PSR-4 Autoloading
-
-**Rule**: All PHP classes must follow PSR-4 autoloading. The namespace root for a module `deploya_pokemon` is `Drupal\deploya_pokemon`.
-
-```
-web/modules/custom/deploya_pokemon/
-└── src/
-    ├── Service/
-    │   └── PokemonSyncService.php      → Drupal\deploya_pokemon\Service\PokemonSyncService
-    ├── Plugin/
-    │   └── QueueWorker/
-    │       └── PokemonSyncWorker.php   → Drupal\deploya_pokemon\Plugin\QueueWorker\PokemonSyncWorker
-    ├── Commands/
-    │   └── PokemonCommands.php         → Drupal\deploya_pokemon\Commands\PokemonCommands
-    └── Form/
-        └── PokemonSyncForm.php         → Drupal\deploya_pokemon\Form\PokemonSyncForm
-```
+> Coding standards and conventions → [DRUPAL_CODING_STANDARDS.md](DRUPAL_CODING_STANDARDS.md)
 
 ---
 
-## Dependency Injection
+## Module Map
 
-### Never Use Static `\Drupal::` Calls Inside Classes
-
-**Rule**: Never call `\Drupal::service()`, `\Drupal::entityTypeManager()`, or any other static `\Drupal::` method inside a class. Always inject dependencies through the constructor.
-
-**❌ Bad:**
-
-```php
-public function syncById(int $id): bool {
-  $client = \Drupal::httpClient();
-  $logger = \Drupal::logger('deploya_pokemon');
-  $entity_manager = \Drupal::entityTypeManager();
-}
+```
+├── pokemon_api/           ← PokeAPI client: fetches, normalises
+│   └── CLAUDE.md          ← This file
+└── pokemon_api_sync/      ← Drupal sync: maps pokemon_api data into Drupal entities
 ```
 
-**✅ Good:**
+**Strict dependency direction:**
 
-```php
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use GuzzleHttp\ClientInterface;
-use Psr\Log\LoggerInterface;
-
-class PokemonSyncService {
-
-  public function __construct(
-    protected ClientInterface $httpClient,
-    protected EntityTypeManagerInterface $entityTypeManager,
-    protected LoggerInterface $logger,
-  ) {}
-
-}
+```
+pokemon_api_sync  →  depends on  →  pokemon_api
+pokemon_api       →  knows nothing about  →  Drupal entities / nodes
 ```
 
-### Static Calls Are Allowed Only in Procedural Code
-
-**Rule**: `\Drupal::` static calls are acceptable only in `.module` files and other procedural contexts (hooks) where a class cannot be used.
-
-**✅ Acceptable in `.module` files:**
-
-```php
-/**
- * Implements hook_cron().
- */
-function deploya_pokemon_cron(): void {
-  \Drupal::service('deploya_pokemon.sync_service')->syncAll();
-}
-```
+- `pokemon_api` must never import or reference anything from `pokemon_api_sync`.
+- `pokemon_api_sync` is the only layer allowed to create or update Drupal nodes and taxonomy terms.
 
 ---
 
-## Services
+## `pokemon_api` — PokeAPI Client Module
 
-### Define All Services in `*.services.yml`
+### Purpose
 
-**Rule**: Every custom service, event subscriber, queue worker, and command must be declared in the module's `*.services.yml` file with correct tags and arguments.
+Provides a clean PHP interface to the PokeAPI REST API (`https://pokeapi.co/api/v2`).
+Its only job is to **fetch and return structured data**. It has no opinion about how
+that data is stored in Drupal.
 
-**✅ Good (`deploya_pokemon.services.yml`):**
+### Resource Classes (`src/Resource/`)
 
-```yaml
-services:
-  deploya_pokemon.sync_service:
-    class: Drupal\deploya_pokemon\Service\PokemonSyncService
-    arguments:
-      - '@http_client'
-      - '@entity_type.manager'
-      - '@logger.factory'
+Each class in `src/Resource/` represents a PokeAPI endpoint and acts as a DTO (Data Transfer Object). A Resource class encapsulates the endpoint path, handles the HTTP call via `PokeApi`, and exposes the response as typed properties. These are the only objects passed across the module boundary to `pokemon_api_sync` — never raw arrays.
 
-  deploya_pokemon.commands:
-    class: Drupal\deploya_pokemon\Commands\PokemonCommands
-    arguments:
-      - '@deploya_pokemon.sync_service'
-    tags:
-      - { name: drush.command }
-```
+### Responsibilities
 
-### Use `create()` for Plugin Classes
+| Responsibility | Belongs here? |
+|---|---|
+| HTTP requests to PokeAPI endpoints | Yes |
+| Error handling and logging for HTTP failures | Yes |
+| Creating `pokemon` nodes | No — `pokemon_api_sync` |
+| Creating `pokemon_type` taxonomy terms | No — `pokemon_api_sync` |
+| Knowing about Drupal content types or fields | No |
 
-**Rule**: For plugin classes (Blocks, QueueWorkers, Forms), use the `create()` static factory method to inject services.
+### Supported PokeAPI Endpoints
 
-**✅ Good:**
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/pokemon?limit={n}&offset={o}` | `GET` | List Pokémon with pagination |
+| `/pokemon-species?limit={n}&offset={o}` | `GET` | List Pokemon Species with pagination |
+| `/type?limit={n}&offset={o}` | `GET` | List Type with pagination |
+| `/stat?limit={n}&offset={o}` | `GET` | List Stat with pagination |
+| `/ability?limit={n}&offset={o}` | `GET` | List Ability with pagination |
+| `/generation?limit={n}&offset={o}` | `GET` | List Ability with pagination |
 
-```php
-use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Queue\Attribute\QueueWorker;
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+Update this table before calling any new endpoints.
 
-/**
- * Processes Pokémon sync queue items.
- */
-#[QueueWorker(
-  id: 'deploya_pokemon_sync',
-  title: new TranslatableMarkup('Pokémon sync worker'),
-  cron: ['time' => 60],
-)]
-class PokemonSyncWorker extends QueueWorkerBase implements ContainerFactoryPluginInterface {
+### Error Handling
 
-  public function __construct(
-    array $configuration,
-    $plugin_id,
-    $plugin_definition,
-    protected PokemonSyncService $syncService,
-  ) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition);
-  }
-
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    return new static(
-      $configuration,
-      $plugin_id,
-      $plugin_definition,
-      $container->get('deploya_pokemon.sync_service'),
-    );
-  }
-
-}
-```
+- All HTTP exceptions from Guzzle are caught in `PokeApiClient`.
+- On failure, log with `@channel pokemon_api` and throw `Drupal\pokemon_api\Exception\PokeApiException`.
+- Never return `NULL` from a repository method — throw instead.
+- `PokeApiException` is intentionally minimal. Do not add methods or properties.
 
 ---
 
-## Database
+## `pokemon_api_sync` — Drupal Sync Module
 
-### Never Write Raw SQL Strings
+### Purpose
 
-**Rule**: Never concatenate variables directly into SQL strings. Use parameterized queries or entity queries.
+Consumes `pokemon_api` DTOs and persists them as Drupal entities. This module owns
+all knowledge about Drupal content types, field names, and taxonomy vocabularies.
 
-**❌ Bad:**
+### Responsibilities
 
-```php
-$result = $this->database->query("SELECT * FROM node WHERE title = '" . $title . "'");
-```
+| Responsibility | Belongs here? |
+|---|---|
+| Creating / updating `pokemon` nodes | Yes |
+| Creating / updating `pokemon_type` taxonomy terms | Yes |
+| Field mapping from DTO to Drupal fields | Yes |
+| Making HTTP requests | No — `pokemon_api` |
+| Knowing PokeAPI URL structure | No — `pokemon_api` |
 
-**✅ Good — Entity Query (preferred):**
+### Drupal Entity Mapping
 
-```php
-$nids = $this->entityTypeManager
-  ->getStorage('node')
-  ->getQuery()
-  ->accessCheck(FALSE)
-  ->condition('type', 'pokemon')
-  ->condition('title', $name)
-  ->execute();
-```
+| `PokemonData` property | Drupal field | Notes |
+|---|---|---|
+| `$id` | `field_pokemon_id` (integer) | Pokédex number; used as lookup key |
+| `$name` | `title` | Node title |
+| `$height` | `field_pokemon_height` (integer) | Stored in decimetres as returned by API |
+| `$weight` | `field_pokemon_weight` (integer) | Stored in hectograms as returned by API |
+| `$types` | `field_pokemon_types` (entity ref) | References `pokemon_type` taxonomy terms |
+| `$stats` | `field_pokemon_stats` (JSON / paragraph) | Stored as serialised array |
+| `$spriteUrl` | `field_pokemon_sprite` (image or link) | Remote image URL |
+| `PokemonSpeciesData::$flavorText` | `field_pokemon_flavor_text` (text) | English only |
 
-**✅ Good — Parameterized query (when entity query is insufficient):**
+### Node Upsert
 
-```php
-$result = $this->database->select('deploya_pokemon_cache', 'c')
-  ->fields('c', ['data', 'updated'])
-  ->condition('c.pokemon_id', $id)
-  ->execute()
-  ->fetchAssoc();
-```
+Always look up existing nodes by `field_pokemon_id` before creating. See the upsert pattern in [DRUPAL_CODING_STANDARDS.md](DRUPAL_CODING_STANDARDS.md#9-entity-queries--database).
 
-### Custom Tables Use `hook_schema()`
+### Taxonomy Term Upsert
 
-**Rule**: Define all custom database tables in `hook_schema()` inside the module's `.install` file. Never create tables manually.
+Type terms (`pokemon_type` vocabulary) must be looked up by `name` before creating. Never blindly create duplicates.
 
-**✅ Good (`deploya_pokemon.install`):**
+### Drush Commands
 
-```php
-/**
- * Implements hook_schema().
- */
-function deploya_pokemon_schema(): array {
-  $schema['deploya_pokemon_cache'] = [
-    'description' => 'Stores raw PokeAPI responses for diffing and cache.',
-    'fields' => [
-      'pokemon_id' => [
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'description' => 'The Pokédex number.',
-      ],
-      'data' => [
-        'type' => 'blob',
-        'size' => 'big',
-        'not null' => FALSE,
-        'description' => 'Serialized JSON response from PokeAPI.',
-      ],
-      'updated' => [
-        'type' => 'int',
-        'not null' => TRUE,
-        'default' => 0,
-        'description' => 'Unix timestamp of last sync.',
-      ],
-    ],
-    'primary key' => ['pokemon_id'],
-  ];
+| Command | Description |
+|---|---|
+| `pokemon_api_sync:sync-pokemon` | Sync all Pokémon |
 
-  return $schema;
-}
-```
-
----
-
-## HTTP / External API Calls
-
-### Use Drupal's HTTP Client
-
-**Rule**: Always use `\GuzzleHttp\ClientInterface` (injected as `@http_client`) for external API requests. Never use `file_get_contents()` or `curl_*` functions directly.
-
-**✅ Good:**
-
-```php
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\RequestException;
-
-public function fetchPokemon(int $id): ?array {
-  try {
-    $response = $this->httpClient->get("https://pokeapi.co/api/v2/pokemon/{$id}");
-    return json_decode((string) $response->getBody(), TRUE);
-  }
-  catch (RequestException $e) {
-    $this->logger->error('Failed to fetch Pokémon @id: @message', [
-      '@id' => $id,
-      '@message' => $e->getMessage(),
-    ]);
-    return NULL;
-  }
-}
-```
-
-### Use Queue for Bulk API Operations
-
-**Rule**: Never perform bulk external API calls in a single request or cron run. Use Drupal's Queue API to process items one at a time.
-
-**✅ Good — Enqueue items:**
-
-```php
-public function enqueueSyncAll(): void {
-  $queue = $this->queueFactory->get('deploya_pokemon_sync');
-  for ($i = 1; $i <= 151; $i++) {
-    $queue->createItem(['pokemon_id' => $i]);
-  }
-}
-```
-
-**✅ Good — Process in QueueWorker:**
-
-```php
-public function processItem(mixed $data): void {
-  $this->syncService->syncById((int) $data['pokemon_id']);
-}
+```bash
+ddev drush pokemon_api_sync:sync-pokemon
 ```
 
 ---
 
 ## Configuration
 
-### Store Config in `config/install/` YAML
-
-**Rule**: All module configuration must live in YAML files under `config/install/`. Never hard-code configuration values in PHP.
-
-```
-deploya_pokemon/
-└── config/
-    └── install/
-        └── deploya_pokemon.settings.yml
-```
-
-**✅ Good (`deploya_pokemon.settings.yml`):**
+Both modules share a single settings object.
 
 ```yaml
-pokeapi_base_url: 'https://pokeapi.co/api/v2'
-sync_limit: 151
+# pokemon_api/config/install/pokemon_api.settings.yml
+base_url: 'https://pokeapi.co/api/v2'
 ```
 
-**✅ Good — Reading config in PHP:**
-
 ```php
-$config = $this->configFactory->get('deploya_pokemon.settings');
-$baseUrl = $config->get('pokeapi_base_url');
+$this->configFactory->get('pokemon_api.settings')->get('base_url');
 ```
 
 ---
 
-## Hooks
-
-### Use OOP Hook Classes (Drupal 11.1+)
-
-**Rule**: Implement hooks as methods in dedicated classes inside `src/Hook/`, using the `#[Hook]` attribute (introduced in Drupal 11.1). Do **not** add new hook implementations to `.module` files. The `.module` file should only be kept for hooks that are not yet supported as OOP (e.g., `hook_schema`, `hook_install`, `hook_update_N`).
-
-Hook classes in `src/Hook/` are **automatically registered as autowired services** — no `*.services.yml` entry is needed.
-
-**✅ Good — OOP hook class:**
-
-```php
-// src/Hook/PokemonHooks.php
-
-<?php
-
-declare(strict_types=1);
-
-namespace Drupal\deploya_pokemon\Hook;
-
-use Drupal\Core\Hook\Attribute\Hook;
-use Drupal\deploya_pokemon\Service\PokemonSyncService;
-use Drupal\node\NodeInterface;
-
-/**
- * Hook implementations for the deploya_pokemon module.
- */
-class PokemonHooks {
-
-  public function __construct(
-    protected PokemonSyncService $syncService,
-  ) {}
-
-  /**
-   * Implements hook_cron().
-   */
-  #[Hook('cron')]
-  public function cron(): void {
-    $this->syncService->enqueueSyncAll();
-  }
-
-  /**
-   * Implements hook_node_presave().
-   */
-  #[Hook('node_presave')]
-  public function nodepresave(NodeInterface $node): void {
-    if ($node->bundle() === 'pokemon') {
-      $this->syncService->normalize($node);
-    }
-  }
-
-}
-```
-
-**Multiple hooks per class** — group related hooks together:
-
-```php
-/**
- * Implements hook_entity_insert() and hook_entity_update().
- */
-#[Hook('entity_insert')]
-#[Hook('entity_update')]
-public function entitySave(EntityInterface $entity): void {
-  // Fires on both insert and update.
-}
-```
-
-**❌ Bad — procedural hooks for new code:**
-
-```php
-// deploya_pokemon.module — do NOT add new hooks here
-
-function deploya_pokemon_cron(): void {
-  \Drupal::service('deploya_pokemon.sync_service')->enqueueSyncAll();
-}
-```
-
-### What Still Goes in `.module`
-
-Only keep the `.module` file for hooks that cannot yet run as OOP classes:
-
-- `hook_schema()` — runs before full container bootstrap
-- `hook_install()` / `hook_uninstall()` / `hook_update_N()` — install-time hooks
-- Any hook explicitly documented as not yet supporting OOP in the Drupal version in use
-
-```php
-// deploya_pokemon.module — install/schema hooks only
-
-/**
- * Implements hook_schema().
- */
-function deploya_pokemon_schema(): array {
-  // Table definitions.
-}
-```
-
-### Organising Hook Classes
-
-Group hooks by domain, not by hook type. Each class should relate to one area of functionality:
+## File Structure
 
 ```
-src/Hook/
-├── PokemonHooks.php    ← cron, node presave, entity events for pokemon
-├── FormHooks.php       ← form_alter implementations
-└── ThemeHooks.php      ← theme, preprocess hooks (module only; themes stay procedural)
+pokemon_api/
+├── pokemon_api.info.yml
+├── pokemon_api.services.yml          ← PokeApiClient
+├── pokemon_api.install
+├── config/
+│   └── install/
+│       └── pokemon_api.settings.yml
+└── src/
+    ├── Resource/
+    │   └── Pokemon.php
+    ├── Exception/
+    │   └── PokeApiException.php
+    └── PokeApi.php                    ← HTTP only
+
+pokemon_api_sync/
+├── pokemon_api_sync.info.yml          ← depends: [pokemon_api]
+├── pokemon_api_sync.services.yml      ← PokemonSync, Commands
+├── pokemon_api_sync.install
+├── config/
+│   └── install/
+│       └── pokemon_api_sync.settings.yml
+└── src/
+    ├── Drush/Commands/
+    │   └── PokemonSyncCommands.php
+    ├── Hook/
+    │   └── PokemonApiSyncHooks.php
+    └── Service/
+        └── PokemonSync.php            ← node/term upsert logic
 ```
-
----
-
-## Logging
-
-### Use the Logger Factory, Not `error_log()` or `print`
-
-**Rule**: Always use Drupal's logger service. Inject `@logger.factory` and call `$this->loggerFactory->get('module_name')`.
-
-**✅ Good:**
-
-```php
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-
-public function __construct(
-  protected LoggerChannelFactoryInterface $loggerFactory,
-) {}
-
-public function doSomething(): void {
-  $logger = $this->loggerFactory->get('deploya_pokemon');
-  $logger->info('Synced Pokémon @name.', ['@name' => $name]);
-  $logger->error('Sync failed for ID @id.', ['@id' => $id]);
-}
-```
-
----
-
-## Drush Commands
-
-### Use Drush 12+ Attribute-Based Commands
-
-**Rule**: Define Drush commands using PHP 8 attributes (Drush 12+ style). Do not use the legacy `$items` array annotation style.
-
-**✅ Good:**
-
-```php
-namespace Drupal\deploya_pokemon\Commands;
-
-use Drush\Attributes as CLI;
-use Drush\Commands\DrushCommands;
-
-/**
- * Drush commands for the deploya_pokemon module.
- */
-class PokemonCommands extends DrushCommands {
-
-  public function __construct(
-    protected PokemonSyncService $syncService,
-  ) {
-    parent::__construct();
-  }
-
-  /**
-   * Syncs Pokémon data from the PokeAPI.
-   */
-  #[CLI\Command(name: 'deploya:pokemon-sync', aliases: ['dps'])]
-  #[CLI\Option(name: 'id', description: 'Sync a single Pokémon by Pokédex number.')]
-  #[CLI\Usage(name: 'deploya:pokemon-sync', description: 'Sync all Pokémon.')]
-  #[CLI\Usage(name: 'deploya:pokemon-sync --id=25', description: 'Sync only Pikachu.')]
-  public function sync(array $options = ['id' => NULL]): void {
-    if ($options['id']) {
-      $this->syncService->syncById((int) $options['id']);
-      $this->logger()->success(dt('Synced Pokémon #@id.', ['@id' => $options['id']]));
-    }
-    else {
-      $this->syncService->enqueueSyncAll();
-      $this->logger()->success(dt('All Pokémon queued for sync.'));
-    }
-  }
-
-}
-```
-
----
-
-## JSON:API / Decoupled API
-
-### Use Config to Control JSON:API Exposure
-
-**Rule**: Control which fields are exposed via JSON:API through configuration YAML, not in PHP. Place configs in `config/install/`.
-
-```yaml
-# config/install/jsonapi.resource_type.node--pokemon.yml
-resourceType: node--pokemon
-entityType: node
-bundle: pokemon
-disabled: false
-fields:
-  field_pokemon_types:
-    disabled: false
-    publicName: types
-  field_pokemon_sprite:
-    disabled: false
-    publicName: sprite
-```
-
-### Never Expose Sensitive Data
-
-**Rule**: Always review which fields are included in JSON:API responses. Internal fields (`uid`, revision fields, internal metadata) should be explicitly disabled if not needed by the Next.js frontend.
-
----
-
-## Security
-
-### Always Use `accessCheck()` in Entity Queries
-
-**Rule**: Always specify `->accessCheck(TRUE)` or `->accessCheck(FALSE)` explicitly in entity queries. Never rely on the default — it varies by Drupal version.
-
-**❌ Bad:**
-
-```php
-$query = $this->entityTypeManager->getStorage('node')->getQuery()
-  ->condition('type', 'pokemon');
-```
-
-**✅ Good:**
-
-```php
-$query = $this->entityTypeManager->getStorage('node')->getQuery()
-  ->accessCheck(FALSE) // OK for internal sync processes
-  ->condition('type', 'pokemon');
-```
-
-### Sanitize Output in Twig
-
-**Rule**: Never pass raw HTML from a module to a Twig template. Use `Markup::create()` only when you fully control and trust the source. For user content, always use `{{ variable }}` (auto-escaped by Twig).
 
 ---
 
 ## Testing
 
-### Write Kernel Tests for Services
-
-**Rule**: Every service class should have a corresponding Kernel test in `tests/src/Kernel/`.
-
-```
-deploya_pokemon/
-└── tests/
-    └── src/
-        ├── Unit/
-        │   └── PokemonNormalizerTest.php
-        └── Kernel/
-            └── PokemonSyncServiceTest.php
-```
-
-**✅ Good:**
-
-```php
-namespace Drupal\Tests\deploya_pokemon\Kernel;
-
-use Drupal\KernelTests\KernelTestBase;
-
-/**
- * Tests the PokemonSyncService.
- *
- * @group deploya_pokemon
- */
-class PokemonSyncServiceTest extends KernelTestBase {
-
-  protected static $modules = ['deploya_pokemon', 'node', 'user'];
-
-  public function testSyncById(): void {
-    // ...
-  }
-
-}
-```
+Store all API response fixtures as JSON files in `tests/fixtures/`.
 
 ---
 
-## Module File Structure
+## Guardrails
 
-Every deploya custom module follows this structure:
-
-```
-deploya_[name]/
-├── deploya_[name].info.yml         ← Module metadata
-├── deploya_[name].module           ← Schema/install hooks only (hook_schema, hook_install, hook_update_N)
-├── deploya_[name].services.yml     ← Service definitions (not needed for Hook classes — auto-registered)
-├── deploya_[name].routing.yml      ← Routes (if any)
-├── deploya_[name].permissions.yml  ← Permissions (if any)
-├── deploya_[name].install          ← hook_schema, hook_install, updates
-├── config/
-│   └── install/                    ← Default configuration YAML
-├── src/
-│   ├── Commands/                   ← Drush commands
-│   ├── Form/                       ← Drupal forms
-│   ├── Hook/                       ← OOP Hook classes (auto-registered, no services.yml needed)
-│   │   ├── PokemonHooks.php        ← cron, node presave, entity events
-│   │   ├── FormHooks.php           ← form_alter implementations
-│   │   └── ThemeHooks.php          ← preprocess / theme hooks
-│   ├── Plugin/
-│   │   └── QueueWorker/            ← Queue workers
-│   └── Service/                    ← Business logic services
-└── tests/
-    └── src/
-        ├── Unit/
-        └── Kernel/
-```
-
----
-
-## Workflow
-
-### After Making Module Changes
-
-**Rule**: After completing any changes to a custom module, always:
-
-1. **Clear caches**: `drush cr`
-2. **Check for config drift**: `drush cst` (config status must be empty or intentional)
-3. **Run any pending updates**: `drush updb -y`
-4. **Export config if changed**: `drush cex -y`
-
-```bash
-drush cr
-drush cst
-drush updb -y
-drush cex -y
-```
-
----
-
-## Summary
-
-1. **Follow Drupal coding standards** — 2-space indent, DocBlocks, proper naming
-2. **PSR-4 autoloading** — all classes under `src/` with correct namespaces
-3. **No static `\Drupal::` in classes** — use constructor dependency injection
-4. **No raw SQL** — use entity queries or parameterized DB queries
-5. **No direct HTTP calls** — use `@http_client` (Guzzle) with try/catch
-6. **Use Queue API for bulk operations** — never bulk-call external APIs in one go
-7. **Config in YAML** — never hard-code configuration in PHP
-8. **Hooks as OOP classes** — use `#[Hook]` attribute in `src/Hook/` (Drupal 11.1+); `.module` only for `hook_schema`, `hook_install`, `hook_update_N`
-9. **Use logger factory** — never use `error_log()` or `print`
-10. **Drush 12+ attributes** — use PHP attribute syntax for commands
-11. **`accessCheck()` always explicit** — never rely on default in entity queries
-12. **Run `drush cr` and `drush cex` after changes**
+- **`pokemon_api` must never reference Drupal entity types, field names, or node storage.**
+- **`pokemon_api_sync` must never make HTTP calls directly.**
+- **Never pass raw `array` API responses across the module boundary** — use DTOs.
+- **Never return `NULL` from repository methods** — throw `PokeApiException`.
+- **Always upsert, never blindly create** — check for existing node by `field_pokemon_id`.
