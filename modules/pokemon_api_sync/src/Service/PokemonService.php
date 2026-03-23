@@ -38,7 +38,7 @@ class PokemonService {
    */
   public function getParagraphs(Pokemon $pokemon, ?ContentEntityBase $node): array {
     return [
-      'moves' => $this->moveParagraphService->getOrCreateMoveParagraphs($pokemon->getMoves(), $node),
+      // 'moves' => $this->moveParagraphService->getOrCreateMoveParagraphs($pokemon->getMoves(), $node),
       'stats' => $this->statParagraphService->getOrCreateStatParagraphs($pokemon->getStats(), $node),
     ];
   }

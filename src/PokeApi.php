@@ -16,9 +16,9 @@ use GuzzleHttp\Exception\GuzzleException;
 class PokeApi extends HttpRequest implements PokeApiInterface {
 
   /**
-   * The PokeAPI base URL.
+   * The config factory.
    */
-  protected readonly string $pokemonApiUrl;
+  protected readonly ConfigFactoryInterface $configFactory;
 
   /**
    * Constructs a PokeApi object.
@@ -27,19 +27,28 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    *   The HTTP client.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
    *   The config factory.
+   */
+  public function __construct(ClientInterface $client, ConfigFactoryInterface $config) {
+    parent::__construct($client);
+    $this->configFactory = $config;
+  }
+
+  /**
+   * Gets the PokeAPI base URL from configuration.
+   *
+   * @return string
+   *   The base URL.
    *
    * @throws \Drupal\pokemon_api\Exception\PokeApiException
    *   If the API URL is not configured.
    */
-  public function __construct(ClientInterface $client, ConfigFactoryInterface $config) {
-    parent::__construct($client);
-
-    $pokemonApiUrl = $config->get('pokemon_api.settings')->get('base_url');
+  protected function getBaseUrl(): string {
+    $pokemonApiUrl = $this->configFactory->get('pokemon_api.settings')->get('base_url');
     if (empty($pokemonApiUrl)) {
       throw new PokeApiException('Pokemon API URL not configured.');
     }
 
-    $this->pokemonApiUrl = trim($pokemonApiUrl);
+    return trim($pokemonApiUrl);
   }
 
   /**
@@ -48,7 +57,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   public function getResources(string $endpoint, int $limit = self::MAX_LIMIT, int $offset = 0): array {
     $this->validateEndpoint($endpoint);
 
-    $url = $this->pokemonApiUrl . $endpoint;
+    $url = $this->getBaseUrl() . $endpoint;
 
     try {
       $response = $this->get($url, [], [
@@ -80,7 +89,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
   public function getResource(string $endpoint, int $id): ResourceInterface {
     $this->validateEndpoint($endpoint);
 
-    $url = $this->pokemonApiUrl . $endpoint . '/' . $id;
+    $url = $this->getBaseUrl() . $endpoint . '/' . $id;
 
     try {
       $response = $this->get($url, [], []);

@@ -1,0 +1,41 @@
+services:
+  pokemon_api_sync.commands.ability_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\AbilitySyncCommands
+    arguments: ['@database', '@pokemon_api_sync.ability_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.evolution_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\EvolutionSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.evolution_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.generation_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\GenerationSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.generation_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.move_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\MoveSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.move_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.pokemon_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\PokemonSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.pokemon_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.pokemon_species_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\PokemonSpeciesSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.pokemon_species_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.stat_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\StatSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.stat_sync']
+    tags:
+      - { name: drush.command }
+  pokemon_api_sync.commands.type_sync:
+    class: Drupal\pokemon_api_sync\Drush\Commands\TypeSyncCommands
+    arguments: ['@database', '@pokemon_api_sync.type_sync']
+    tags:
+      - { name: drush.command }
