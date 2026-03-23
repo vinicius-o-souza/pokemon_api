@@ -38,6 +38,7 @@ class StatParagraphLimitConstraintValidator extends ConstraintValidator {
         $this->context->addViolation($constraint->message, ['@term' => $term->label()]);
         break;
       }
+
       $existingTerms[] = $term->id();
     }
   }

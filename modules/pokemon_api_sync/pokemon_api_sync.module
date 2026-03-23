@@ -4,3 +4,12 @@
  * @file
  * Primary module hooks for Pokemon API Sync module.
  */
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function pokemon_api_sync_module_implements_alter(&$implementations, $hook) {
+  if ($hook === 'entity_bundle_field_info_alter') {
+    $implementations['pokemon_api_sync'] = -100;
+  }
+}

@@ -41,14 +41,4 @@ class PokemonApiSyncHooks {
     }
   }
 
-  /**
-   * Implements hook_module_implements_alter().
-   */
-  #[Hook('module_implements_alter')]
-  public function moduleImplementsAlter(array &$implementations, string $hook): void {
-    if ($hook === 'entity_bundle_field_info_alter') {
-      $implementations['pokemon_api_sync'] = -100;
-    }
-  }
-
 }
