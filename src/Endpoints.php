@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api;
 
 /**
- * Pokemon API Endpoints.
+ * PokeAPI endpoints.
  */
 enum Endpoints: string {
 
@@ -31,7 +33,7 @@ enum Endpoints: string {
 
   case EVOLUTION_TRIGGER = 'evolution-trigger';
 
-  case GENGER = 'gender';
+  case GENDER = 'gender';
 
   case GENERATION = 'generation';
 

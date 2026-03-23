@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 /**
- * Abtract Resource class to get from Pokemon API.
+ * Abstract base class for PokeAPI resources.
  */
 abstract class Resource implements ResourceInterface {
 
   /**
-   * The ID of the resource.
+   * The resource ID.
    */
   protected int $id;
 
@@ -25,7 +27,6 @@ abstract class Resource implements ResourceInterface {
     protected string $name = '',
   ) {
     $this->name = ucfirst($name);
-    $this->url = $url;
     $this->id = self::extractIdFromUrl($url);
   }
 
@@ -33,13 +34,11 @@ abstract class Resource implements ResourceInterface {
    * {@inheritdoc}
    */
   public function get(string $field): mixed {
-    if (property_exists($this, $field)) {
-      $value = $this->$field;
-      return $value ?? NULL;
+    if (!property_exists($this, $field)) {
+      throw new \InvalidArgumentException(sprintf('%s is not a valid field for %s', $field, static::class));
     }
-    else {
-      throw new \InvalidArgumentException("$field is not a valid field for " . get_class($this));
-    }
+
+    return $this->$field ?? NULL;
   }
 
   /**
@@ -93,26 +92,23 @@ abstract class Resource implements ResourceInterface {
         throw new \InvalidArgumentException('Missing required "url" or "id" key in data.');
       }
 
-      $data['url'] = $data['id'];
+      $data['url'] = (string) $data['id'];
     }
 
     return new static($data['url'], $data['name'] ?? '');
   }
 
   /**
-   * Extract the ID from the URL.
+   * Extracts the ID from a PokeAPI URL.
    *
    * @param string $url
    *   The URL.
    *
    * @return int
-   *   The ID from the URL.
+   *   The extracted ID.
    */
   public static function extractIdFromUrl(string $url): int {
-    $parts = explode('/', $url);
-    if (end($parts) === '') {
-      array_pop($parts);
-    }
+    $parts = explode('/', rtrim($url, '/'));
     return (int) end($parts);
   }
 

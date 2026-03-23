@@ -2,5 +2,3 @@ services:
   pokemon_api.poke_api:
     class: Drupal\pokemon_api\PokeApi
     arguments: ['@http_client', '@config.factory']
-    tags:
-      - { name: service }

@@ -21,7 +21,7 @@ class StatParagraphLimitConstraintValidator extends ConstraintValidator {
 
     $existing_terms = [];
 
-    foreach ($items as $delta => $item) {
+    foreach ($items as $item) {
       $paragraph = $item->entity;
 
       if ($paragraph) {

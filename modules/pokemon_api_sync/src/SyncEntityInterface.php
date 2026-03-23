@@ -1,66 +1,68 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityStorageInterface;
 
 /**
- * Interface to sync entities.
+ * Interface for entity sync operations.
  */
 interface SyncEntityInterface {
 
   /**
-   * Get the storage class.
+   * Gets the entity storage handler.
    *
    * @return \Drupal\Core\Entity\EntityStorageInterface
-   *   The storage class.
+   *   The storage handler.
    */
   public function getStorageClass(): EntityStorageInterface;
 
   /**
-   * Create a new entity.
+   * Creates a new entity.
    *
    * @param array $data
-   *   The data to create the entity with.
+   *   The entity data.
    *
    * @return \Drupal\Core\Entity\ContentEntityBase|null
-   *   The created entity or NULL on failure.
+   *   The created entity, or NULL on failure.
    */
   public function createEntity(array $data): ?ContentEntityBase;
 
   /**
-   * Read a entity by its ID.
+   * Reads an entity by its PokeAPI ID.
    *
    * @param int $pokeApiId
-   *   The PokeApi ID to read.
+   *   The PokeAPI ID.
    *
    * @return \Drupal\Core\Entity\ContentEntityBase|null
-   *   The entity if found, or NULL if not found.
+   *   The entity, or NULL if not found.
    */
   public function readEntityByPokeId(int $pokeApiId): ?ContentEntityBase;
 
   /**
-   * Update an existing entity.
+   * Updates an existing entity.
    *
    * @param \Drupal\Core\Entity\ContentEntityBase $entity
-   *   The entity entity to update.
+   *   The entity to update.
    * @param array $data
-   *   The data to update the entity with.
+   *   The data to set.
    *
    * @return \Drupal\Core\Entity\ContentEntityBase|null
-   *   The updated entity entity or FALSE on failure.
+   *   The updated entity, or NULL on failure.
    */
   public function updateEntity(ContentEntityBase $entity, array $data): ?ContentEntityBase;
 
   /**
-   * Delete a entity.
+   * Deletes an entity.
    *
    * @param \Drupal\Core\Entity\ContentEntityBase $entity
-   *   The entity entity to delete.
+   *   The entity to delete.
    *
    * @return bool
-   *   TRUE if the entity is successfully deleted, FALSE on failure.
+   *   TRUE on success, FALSE on failure.
    */
   public function deleteEntity(ContentEntityBase $entity): bool;
 

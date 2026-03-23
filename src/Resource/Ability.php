@@ -1,21 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource Ability class.
+ * Ability resource.
  */
 class Ability extends TranslatableResource {
 
   use FlavorTextTrait;
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
     return Endpoints::ABILITY->value;
@@ -26,7 +25,6 @@ class Ability extends TranslatableResource {
    */
   public static function createFromArray(array $data): static {
     $ability = parent::createFromArray($data);
-    $ability->setNames($data['names'] ?? []);
     $ability->setFlavorText($data['flavor_text_entries'] ?? []);
 
     return $ability;

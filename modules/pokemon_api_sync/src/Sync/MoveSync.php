@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\pokemon_api\Endpoints;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api\Resource\Move;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
- * Sync Pokemon Move taxonomy.
+ * Syncs Pokémon moves to taxonomy terms.
  */
 class MoveSync extends SyncTermEntity {
 
   /**
    * {@inheritdoc}
    */
-  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
+  public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
     $moves = $this->pokeApi->getResources(Endpoints::MOVE->value, $limit, $offset);
 
     foreach ($moves as $move) {
@@ -45,12 +47,13 @@ class MoveSync extends SyncTermEntity {
       $data['field_priority'] = $resource->getPriority();
 
       $type = $resource->getType();
-      $type = $this->getStorageClass()->loadByProperties([
-        'vid' => 'pokemon_type',
-        'field_pokeapi_id' => $type->getId(),
-      ]);
-
-      $data['field_type'] = $type;
+      if ($type) {
+        $typeTerms = $this->getStorageClass()->loadByProperties([
+          'vid' => 'pokemon_type',
+          'field_pokeapi_id' => $type->getId(),
+        ]);
+        $data['field_type'] = $typeTerms;
+      }
     }
 
     return $data;
@@ -63,6 +66,7 @@ class MoveSync extends SyncTermEntity {
     if (!$resource instanceof Move) {
       return [];
     }
+
     return [
       'name' => $resource->getNames(),
       'description' => $resource->getFlavorText(),

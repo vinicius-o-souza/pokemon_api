@@ -2,3 +2,20 @@
 /composer.lock
 *.html
 .lando.yml
+
+# Drupal specific:
+/.csslintrc
+/.eslintignore
+/.eslintrc.json
+/.gitattributes
+/.ht.router.php
+/.htaccess
+/INSTALL.txt
+/autoload.php
+/example.gitignore
+/index.php
+/robots.txt
+/update.php
+/sites/*
+/recipes/*
+/profiles/*

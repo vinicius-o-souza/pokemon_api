@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\pokemon_api\Endpoints;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api\Resource\Stat;
 use Drupal\pokemon_api_sync\SyncTermEntity;
 
 /**
- * Sync Pokemon Stat taxonomy.
+ * Syncs Pokémon stats to taxonomy terms.
  */
 class StatSync extends SyncTermEntity {
 
   /**
    * {@inheritdoc}
    */
-  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
+  public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
     $stats = $this->pokeApi->getResources(Endpoints::STAT->value, $limit, $offset);
 
     foreach ($stats as $stat) {
@@ -38,6 +40,7 @@ class StatSync extends SyncTermEntity {
     if (!$resource instanceof Stat) {
       return [];
     }
+
     return [
       'name' => $resource->getNames(),
     ];

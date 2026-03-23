@@ -1,26 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource EvolutionChain class.
+ * Evolution chain resource.
  */
 class EvolutionChain extends TranslatableResource {
 
   /**
-   * The evolution chain.
+   * The parsed evolution chain as species IDs.
    *
-   * @var array
+   * @var int[]
    */
   private array $evolutions = [];
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
     return Endpoints::EVOLUTION_CHAIN->value;
@@ -37,28 +36,26 @@ class EvolutionChain extends TranslatableResource {
   }
 
   /**
-   * Get the evolution chain.
+   * Gets the evolution chain species IDs.
    *
-   * @return array
-   *   The evolution chain.
+   * @return int[]
+   *   The species IDs in evolution order.
    */
   public function getEvolution(): array {
     return $this->evolutions;
   }
 
   /**
-   * Set the evolution chain.
+   * Sets the evolution chain from raw API chain data.
    *
    * @param array $chain
-   *   The evolution chain.
+   *   The raw chain data from the API.
    */
   public function setEvolution(array $chain): void {
     $evolutionChain = [];
 
     while (isset($chain['species'])) {
-      $specieUrl = $chain['species']['url'];
-      $specieId = self::extractIdFromUrl($specieUrl);
-      $evolutionChain[] = $specieId;
+      $evolutionChain[] = self::extractIdFromUrl($chain['species']['url']);
 
       if (isset($chain['evolves_to'][0])) {
         $chain = $chain['evolves_to'][0];
