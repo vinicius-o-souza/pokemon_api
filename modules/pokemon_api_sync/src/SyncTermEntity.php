@@ -74,7 +74,7 @@ abstract class SyncTermEntity extends SyncEntity {
     $data = $this->getDataFields($resource);
 
     $term = $term ? $this->updateEntity($term, $data) : $this->createEntity($data);
-    if ($term) {
+    if ($term && $term->isTranslatable()) {
       $translatableFields = $this->getTranslatableFields($resource);
       $term = $this->addTranslation($term, $translatableFields);
       $term->save();

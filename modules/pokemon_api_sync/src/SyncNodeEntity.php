@@ -80,6 +80,10 @@ abstract class SyncNodeEntity extends SyncEntity {
       return;
     }
 
+    if (!$node->isTranslatable()) {
+      return;
+    }
+
     $languages = ['es', 'pt-br'];
     foreach ($languages as $language) {
       if (!$node->hasTranslation($language)) {
