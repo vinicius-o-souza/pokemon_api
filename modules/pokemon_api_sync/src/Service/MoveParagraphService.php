@@ -1,69 +1,76 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Service;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Service to manage move paragraphs.
+ * Manages move paragraph entities.
  */
 class MoveParagraphService {
 
   /**
-   * List of move terms.
+   * Cached move terms keyed by PokeAPI ID.
    *
-   * @var array
+   * @var array<string, int>
    */
   private array $moveTerms = [];
 
   /**
-   * Constructs a new MoveParagraphService object.
+   * Constructs a MoveParagraphService object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(private readonly EntityTypeManager $entityTypeManager) {
-    $this->moveTerms = $this->getMoveTerms();
+  public function __construct(private readonly EntityTypeManagerInterface $entityTypeManager) {
+    $this->moveTerms = $this->loadMoveTerms();
   }
 
   /**
-   * Get or create pokemon moves.
+   * Gets or creates move paragraphs for a Pokémon.
    *
    * @param array $pokemonMoves
-   *   The moves terms.
+   *   Moves keyed by PokeAPI ID.
    * @param \Drupal\Core\Entity\ContentEntityBase|null $node
-   *   The pokemon node.
+   *   The existing Pokémon node, or NULL.
    *
    * @return array
-   *   The moves.
+   *   Paragraph reference arrays.
    */
   public function getOrCreateMoveParagraphs(array $pokemonMoves, ?ContentEntityBase $node): array {
     $moves = [];
+
     if ($node) {
       /** @var \Drupal\paragraphs\Entity\Paragraph[] $paragraphs */
       $paragraphs = $node->get('field_pokemon_moves')->referencedEntities();
       foreach ($paragraphs as $paragraph) {
         $moveTerm = $paragraph->get('field_pokemon_move')->entity;
-        if ($moveTerm) {
-          $movePokeApiId = $moveTerm->get('field_pokeapi_id')->value;
-          if ($movePokeApiId) {
-            $paragraph->set('field_pokemon_base_move', $pokemonMoves[$movePokeApiId]);
-            $paragraph->save();
-
-            $moves[] = [
-              'target_id' => $paragraph->id(),
-              'target_revision_id' => $paragraph->getRevisionId(),
-            ];
-            unset($pokemonMoves[$movePokeApiId]);
-          }
+        if (!$moveTerm) {
+          continue;
         }
+
+        $movePokeApiId = $moveTerm->get('field_pokeapi_id')->value;
+        if (!$movePokeApiId || !isset($pokemonMoves[$movePokeApiId])) {
+          continue;
+        }
+
+        $paragraph->set('field_pokemon_base_move', $pokemonMoves[$movePokeApiId]);
+        $paragraph->save();
+
+        $moves[] = [
+          'target_id' => $paragraph->id(),
+          'target_revision_id' => $paragraph->getRevisionId(),
+        ];
+        unset($pokemonMoves[$movePokeApiId]);
       }
     }
 
     foreach ($pokemonMoves as $key => $move) {
-      if ($this->moveTerms['pokemon_move'][$key]) {
-        $moves[] = $this->createMoveParagraph($this->moveTerms['pokemon_move'][$key], $move);
+      if (isset($this->moveTerms[$key])) {
+        $moves[] = $this->createMoveParagraph($this->moveTerms[$key], $move);
       }
     }
 
@@ -71,12 +78,12 @@ class MoveParagraphService {
   }
 
   /**
-   * Retrieves the list of move terms from the taxonomy storage.
+   * Loads move terms from taxonomy storage.
    *
-   * @return array
-   *   Array of moves where the key is the PokeAPI ID and the value term ID.
+   * @return array<string, int>
+   *   Term IDs keyed by PokeAPI ID.
    */
-  private function getMoveTerms(): array {
+  private function loadMoveTerms(): array {
     /** @var \Drupal\taxonomy\Entity\Term[] $terms */
     $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
       'vid' => 'pokemon_move',
@@ -84,22 +91,22 @@ class MoveParagraphService {
 
     $moveTerms = [];
     foreach ($terms as $term) {
-      $moveTerms[$term->get('field_pokeapi_id')->getString()] = $term->id();
+      $moveTerms[$term->get('field_pokeapi_id')->getString()] = (int) $term->id();
     }
 
     return $moveTerms;
   }
 
   /**
-   * Create move paragraph.
+   * Creates a move paragraph entity.
    *
    * @param int $termId
-   *   The term id.
+   *   The move term ID.
    * @param int $move
-   *   The move.
+   *   The base move value.
    *
    * @return array
-   *   The move paragraph.
+   *   The paragraph reference array.
    */
   private function createMoveParagraph(int $termId, int $move): array {
     $paragraph = $this->entityTypeManager->getStorage('paragraph')->create([

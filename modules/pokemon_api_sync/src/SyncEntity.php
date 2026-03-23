@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api\Translation;
 
 /**
- * Class Entity.
+ * Abstract base class for entity sync operations.
  */
 abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
 
@@ -19,14 +21,14 @@ abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
-   *   The logger.
-   * @param \Drupal\pokemon_api\PokeApi $pokeApi
-   *   The PokeApi.
+   *   The logger channel.
+   * @param \Drupal\pokemon_api\PokeApiInterface $pokeApi
+   *   The PokeAPI client.
    */
   public function __construct(
     protected readonly EntityTypeManagerInterface $entityTypeManager,
     protected readonly LoggerChannelInterface $logger,
-    protected readonly PokeApi $pokeApi,
+    protected readonly PokeApiInterface $pokeApi,
   ) {}
 
   /**
@@ -37,15 +39,10 @@ abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
       $entity = $this->getStorageClass()->create($data);
       $entity->save();
 
-      if ($entity instanceof ContentEntityBase) {
-        return $entity;
-      }
-
-      return NULL;
+      return $entity instanceof ContentEntityBase ? $entity : NULL;
     }
     catch (\Exception $e) {
       $this->logger->error('Failed to create entity: @message', ['@message' => $e->getMessage()]);
-
       return NULL;
     }
   }
@@ -58,14 +55,12 @@ abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
       foreach ($data as $field => $value) {
         $entity->set($field, $value);
       }
-
       $entity->save();
 
       return $entity;
     }
     catch (\Exception $e) {
       $this->logger->error('Failed to update entity: @message', ['@message' => $e->getMessage()]);
-
       return NULL;
     }
   }
@@ -76,12 +71,10 @@ abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
   public function deleteEntity(ContentEntityBase $entity): bool {
     try {
       $entity->delete();
-
       return TRUE;
     }
     catch (\Exception $e) {
       $this->logger->error('Failed to delete entity: @message', ['@message' => $e->getMessage()]);
-
       return FALSE;
     }
   }
@@ -90,35 +83,38 @@ abstract class SyncEntity implements SyncEntityInterface, SyncInterface {
    * Adds translations to a content entity.
    *
    * @param \Drupal\Core\Entity\ContentEntityBase $entity
-   *   The content entity to add translations to.
+   *   The entity to add translations to.
    * @param array $fields
-   *   An array of fields containing translations.
+   *   Fields containing Translation objects keyed by field name.
    *
    * @return \Drupal\Core\Entity\ContentEntityBase
-   *   The content entity with added translations.
+   *   The entity with translations applied.
    */
   protected function addTranslation(ContentEntityBase $entity, array $fields): ContentEntityBase {
-    foreach ($fields as $key => $field) {
-      if ($field instanceof Translation) {
-        $languages = [
-          Translation::EN_LANGUAGE => 'en',
-          Translation::ES_LANGUAGE => 'es',
-          Translation::PT_BR_LANGUAGE => 'pt-br',
-        ];
+    $languageMap = [
+      Translation::EN_LANGUAGE => 'en',
+      Translation::ES_LANGUAGE => 'es',
+      Translation::PT_BR_LANGUAGE => 'pt-br',
+    ];
 
-        foreach ($languages as $pokeApiLanguage => $drupalLanguage) {
-          if ($field->getValue($pokeApiLanguage)) {
-            if (!$entity->hasTranslation($drupalLanguage)) {
-              $entity->addTranslation($drupalLanguage, [
-                $key => $field->getValue($pokeApiLanguage),
-              ]);
-            }
-            else {
-              $translationEntity = $entity->getTranslation($drupalLanguage);
-              $translationEntity->set($key, $field->getValue($pokeApiLanguage));
-              $translationEntity->save();
-            }
-          }
+    foreach ($fields as $key => $field) {
+      if (!$field instanceof Translation) {
+        continue;
+      }
+
+      foreach ($languageMap as $pokeApiLanguage => $drupalLanguage) {
+        $value = $field->getValue($pokeApiLanguage);
+        if ($value === NULL) {
+          continue;
+        }
+
+        if (!$entity->hasTranslation($drupalLanguage)) {
+          $entity->addTranslation($drupalLanguage, [$key => $value]);
+        }
+        else {
+          $translationEntity = $entity->getTranslation($drupalLanguage);
+          $translationEntity->set($key, $value);
+          $translationEntity->save();
         }
       }
     }

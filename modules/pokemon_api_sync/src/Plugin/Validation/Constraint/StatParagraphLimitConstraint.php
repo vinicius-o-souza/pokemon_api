@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Plugin\Validation\Constraint;
 
-use Symfony\Component\Validator\Constraint;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\Core\Validation\Attribute\Constraint;
+use Symfony\Component\Validator\Constraint as SymfonyConstraint;
 
 /**
- * Custom validation constraint for limiting paragraphs by stat term.
- *
- * @Constraint(
- *   id = "StatParagraphLimit",
- *   label = @Translation("Stat paragraph limit by stat term", context = "Validation"),
- * )
+ * Validates that each stat term appears only once in paragraph references.
  */
-class StatParagraphLimitConstraint extends Constraint {
+#[Constraint(
+  id: 'StatParagraphLimit',
+  label: new TranslatableMarkup('Stat paragraph limit by stat term', [], ['context' => 'Validation']),
+)]
+class StatParagraphLimitConstraint extends SymfonyConstraint {
 
   /**
-   * Message for constraint violation.
-   *
-   * @var string
+   * The violation message.
    */
   public string $message = 'Only one paragraph with the taxonomy term "@term" is allowed.';
 

@@ -1,34 +1,44 @@
 {
-  "name": "vinicius-o-souza/pokemon_api",
-  "description": "A Drupal 10 module that pull content from the Pokemon API and save into Drupal",
-  "type": "drupal-module",
-  "keywords": ["Drupal", "Pokemon"],
-  "license": "GPL-2.0-or-later",
-  "homepage": "https://github.com/vinicius-o-souza/pokemon_api",
-  "minimum-stability": "dev",
-  "prefer-stable": true,
-  "require": {
-    "php": ">=8.3",
-    "drupal/core": "^10.0 | ^11.0",
-    "drush/drush": " ^11 | ^12 | ^13",
-    "drupal/paragraphs": "^1.20"
-  },
-  "autoload": {
-    "psr-4": {
-      "Drupal\\pokemon_api\\": "src/",
-      "Drupal\\pokemon_api_sync\\": "modules/pokemon_api_sync/src/"
+    "name": "vinicius-o-souza/pokemon_api",
+    "description": "A Drupal module that pulls content from the PokeAPI and saves into Drupal.",
+    "type": "drupal-module",
+    "keywords": ["Drupal", "Pokemon"],
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://github.com/vinicius-o-souza/pokemon_api",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": {
+        "drupal": {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    },
+    "require": {
+        "php": ">=8.4",
+        "drupal/core": "^10.0 || ^11.0",
+        "drush/drush": "^12 || ^13",
+        "drupal/paragraphs": "^1.20"
+    },
+    "autoload": {
+        "psr-4": {
+            "Drupal\\pokemon_api\\": "src/",
+            "Drupal\\pokemon_api_sync\\": "modules/pokemon_api_sync/src/"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1",
+        "phpmetrics/phpmetrics": "^2.8",
+        "drupal/coder": "^8.3",
+        "phpstan/extension-installer": "^1.4",
+        "mglaman/phpstan-drupal": "^2.0",
+        "phpstan/phpstan-deprecation-rules": "^2.0"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "drupal/core-composer-scaffold": true
+        }
     }
-  },
-  "require-dev": {
-    "phpstan/phpstan": "*",
-    "phpmetrics/phpmetrics": "^2.8",
-    "drupal/coder": "^8.3"
-  },
-  "config": {
-    "allow-plugins": {
-      "dealerdirect/phpcodesniffer-composer-installer": true,
-      "php-http/discovery": true,
-      "phpstan/extension-installer": true
-    }
-  }
 }

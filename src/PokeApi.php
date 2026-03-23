@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -9,31 +11,32 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 
 /**
- * Class for PokeApi.
+ * PokeAPI HTTP client.
  */
 class PokeApi extends HttpRequest implements PokeApiInterface {
 
   /**
-   * The Pokemon API Url.
-   *
-   * @var string
+   * The PokeAPI base URL.
    */
-  protected string $pokemonApiUrl;
+  protected readonly string $pokemonApiUrl;
 
   /**
-   * Constructs a new instance of the PokeApi.
+   * Constructs a PokeApi object.
    *
    * @param \GuzzleHttp\ClientInterface $client
-   *   The client interface.
+   *   The HTTP client.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config
-   *   The config factory interface.
+   *   The config factory.
+   *
+   * @throws \Drupal\pokemon_api\Exception\PokeApiException
+   *   If the API URL is not configured.
    */
   public function __construct(ClientInterface $client, ConfigFactoryInterface $config) {
     parent::__construct($client);
 
-    $pokemonApiUrl = $config->get('pokemon_api.settings')->get('pokemon_api_url');
+    $pokemonApiUrl = $config->get('pokemon_api.settings')->get('base_url');
     if (empty($pokemonApiUrl)) {
-      throw new \Exception('Pokemon API URL not set.');
+      throw new PokeApiException('Pokemon API URL not configured.');
     }
 
     $this->pokemonApiUrl = trim($pokemonApiUrl);
@@ -43,9 +46,7 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
    * {@inheritdoc}
    */
   public function getResources(string $endpoint, int $limit = self::MAX_LIMIT, int $offset = 0): array {
-    if (!$this->validateEndpoint($endpoint)) {
-      throw new PokeApiException(sprintf('The endpoint "%s" is not valid.', $endpoint));
-    }
+    $this->validateEndpoint($endpoint);
 
     $url = $this->pokemonApiUrl . $endpoint;
 
@@ -54,40 +55,30 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
         'limit' => $limit,
         'offset' => $offset,
       ]);
-
     }
     catch (GuzzleException $e) {
       throw new PokeApiException($e->getMessage(), $e->getCode(), $e);
     }
 
-    $body = $response->getBody()->getContents();
-    if (empty($body)) {
-      throw new \RuntimeException('The response body is empty.');
+    $data = $this->decodeResponse($response->getBody()->getContents());
+
+    if (!isset($data['results'])) {
+      throw new PokeApiException('The response is missing the "results" key.');
     }
 
-    $response = json_decode($body, TRUE);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-      throw new \RuntimeException(sprintf('Error parsing JSON response: %s', json_last_error_msg()));
-    }
+    $resourceClass = ResourceFactory::getResourceClass($endpoint);
 
-    if (!isset($response['results']) || $response['results'] == NULL) {
-      throw new \RuntimeException('The response is missing the "results" key.');
-    }
-
-    $resourceClass = $this->getResourceClass($endpoint);
-
-    return array_map(function ($resource) use ($resourceClass) {
-      return new $resourceClass($resource['url'], $resource['name'] ?? '');
-    }, $response['results']);
+    return array_map(
+      fn(array $resource): ResourceInterface => new $resourceClass($resource['url'], $resource['name'] ?? ''),
+      $data['results'],
+    );
   }
 
   /**
    * {@inheritdoc}
    */
   public function getResource(string $endpoint, int $id): ResourceInterface {
-    if (!$this->validateEndpoint($endpoint)) {
-      throw new PokeApiException(sprintf('The endpoint "%s" is not valid.', $endpoint));
-    }
+    $this->validateEndpoint($endpoint);
 
     $url = $this->pokemonApiUrl . $endpoint . '/' . $id;
 
@@ -98,56 +89,55 @@ class PokeApi extends HttpRequest implements PokeApiInterface {
       throw new PokeApiException($e->getMessage(), $e->getCode(), $e);
     }
 
-    $body = $response->getBody()->getContents();
-    if (empty($body)) {
-      throw new \RuntimeException('The response body is empty.');
-    }
+    $data = $this->decodeResponse($response->getBody()->getContents());
 
-    $response = json_decode($body, TRUE);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-      throw new \RuntimeException(sprintf('Error parsing JSON response: %s', json_last_error_msg()));
-    }
-
-    if (empty($response)) {
+    if (empty($data)) {
       throw new PokeApiException('Resource not found.');
     }
 
-    $resourceClass = $this->getResourceClass($endpoint);
-    return $resourceClass::createFromArray($response);
+    $resourceClass = ResourceFactory::getResourceClass($endpoint);
+    return $resourceClass::createFromArray($data);
   }
 
   /**
-   * Validates the endpoint.
+   * Validates that the endpoint is a known PokeAPI endpoint.
    *
    * @param string $endpoint
-   *   The endpoint.
-   *
-   * @return bool
-   *   TRUE if the endpoint is valid, FALSE otherwise.
-   */
-  private function validateEndpoint(string $endpoint): bool {
-    return in_array($endpoint, array_column(Endpoints::cases(), 'value'));
-  }
-
-  /**
-   * Retrieves the resource class for a given endpoint.
-   *
-   * @param string $endpoint
-   *   The endpoint for which to retrieve the resource class.
+   *   The endpoint to validate.
    *
    * @throws \Drupal\pokemon_api\Exception\PokeApiException
-   *   If the resource for the endpoint is not valid.
-   *
-   * @return class-string<\Drupal\pokemon_api\Resource\Resource>
-   *   The resource class for the endpoint.
+   *   If the endpoint is not valid.
    */
-  private function getResourceClass(string $endpoint): string {
-    $class = ResourceFactory::getResourceClass($endpoint);
-
-    if (empty($class)) {
-      throw new PokeApiException(sprintf('The resource for the endpoint "%s" is not valid.', $endpoint));
+  private function validateEndpoint(string $endpoint): void {
+    $validEndpoints = array_column(Endpoints::cases(), 'value');
+    if (!in_array($endpoint, $validEndpoints, TRUE)) {
+      throw new PokeApiException(sprintf('The endpoint "%s" is not valid.', $endpoint));
     }
-    return $class;
+  }
+
+  /**
+   * Decodes a JSON response body.
+   *
+   * @param string $body
+   *   The response body.
+   *
+   * @return array
+   *   The decoded data.
+   *
+   * @throws \Drupal\pokemon_api\Exception\PokeApiException
+   *   If the response is empty or cannot be decoded.
+   */
+  private function decodeResponse(string $body): array {
+    if ($body === '') {
+      throw new PokeApiException('The response body is empty.');
+    }
+
+    $data = json_decode($body, TRUE);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+      throw new PokeApiException(sprintf('Error parsing JSON response: %s', json_last_error_msg()));
+    }
+
+    return $data;
   }
 
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Plugin\Validation\Constraint;
 
 use Drupal\Core\Field\FieldItemListInterface;
@@ -7,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 /**
- * Custom validation constraint for limiting paragraphs by stat term.
+ * Validates the StatParagraphLimit constraint.
  */
 class StatParagraphLimitConstraintValidator extends ConstraintValidator {
 
@@ -19,22 +21,24 @@ class StatParagraphLimitConstraintValidator extends ConstraintValidator {
       return;
     }
 
-    $existing_terms = [];
+    $existingTerms = [];
 
-    foreach ($items as $delta => $item) {
+    foreach ($items as $item) {
       $paragraph = $item->entity;
-
-      if ($paragraph) {
-        $term = $paragraph->get('field_pokemon_stat')->entity;
-
-        if ($term) {
-          if (in_array($term->id(), $existing_terms)) {
-            $this->context->addViolation($constraint->message, ['@term' => $term->label()]);
-            break;
-          }
-          $existing_terms[] = $term->id();
-        }
+      if (!$paragraph) {
+        continue;
       }
+
+      $term = $paragraph->get('field_pokemon_stat')->entity;
+      if (!$term) {
+        continue;
+      }
+
+      if (in_array($term->id(), $existingTerms, TRUE)) {
+        $this->context->addViolation($constraint->message, ['@term' => $term->label()]);
+        break;
+      }
+      $existingTerms[] = $term->id();
     }
   }
 

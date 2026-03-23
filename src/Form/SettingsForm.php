@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Form to set pokemon_api configurations.
+ * Configuration form for Pokemon API settings.
  */
 final class SettingsForm extends ConfigFormBase {
 
@@ -28,10 +30,12 @@ final class SettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state): array {
-    $form['pokemon_api_url'] = [
+    $form['base_url'] = [
       '#type' => 'url',
-      '#title' => $this->t('Pokemon API Url'),
-      '#default_value' => $this->config('pokemon_api.settings')->get('pokemon_api_url'),
+      '#title' => $this->t('Poke API URL'),
+      '#description' => $this->t('The base URL for the PokeAPI, e.g. https://pokeapi.co/api/v2/'),
+      '#default_value' => $this->config('pokemon_api.settings')->get('base_url'),
+      '#required' => TRUE,
     ];
     return parent::buildForm($form, $form_state);
   }
@@ -41,7 +45,7 @@ final class SettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state): void {
     $this->config('pokemon_api.settings')
-      ->set('pokemon_api_url', $form_state->getValue('pokemon_api_url'))
+      ->set('base_url', $form_state->getValue('base_url'))
       ->save();
     parent::submitForm($form, $form_state);
   }

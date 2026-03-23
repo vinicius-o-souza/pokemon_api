@@ -1,100 +1,102 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api;
 
 /**
- * Pokemon API Endpoints.
+ * Defines all available PokeAPI resource endpoints.
  */
 enum Endpoints: string {
 
-  case ABILITY = 'ability';
+  case Ability = 'ability';
 
-  case BERRY = 'berry';
+  case Berry = 'berry';
 
-  case BERRY_FIRMNESS = 'berry-firmness';
+  case BerryFirmness = 'berry-firmness';
 
-  case CHARACTERISTIC = 'characteristic';
+  case Characteristic = 'characteristic';
 
-  case CONTEST_EFFECT = 'contest-effect';
+  case ContestEffect = 'contest-effect';
 
-  case CONTEST_TYPE = 'contest-type';
+  case ContestType = 'contest-type';
 
-  case EGG_GROUP = 'egg-group';
+  case EggGroup = 'egg-group';
 
-  case ENCOUNTER_CONDITION = 'encounter-condition';
+  case EncounterCondition = 'encounter-condition';
 
-  case ENCOUNTER_CONDITION_VALUE = 'encounter-condition-value';
+  case EncounterConditionValue = 'encounter-condition-value';
 
-  case ENCOUNTER_METHOD = 'encounter-method';
+  case EncounterMethod = 'encounter-method';
 
-  case EVOLUTION_CHAIN = 'evolution-chain';
+  case EvolutionChain = 'evolution-chain';
 
-  case EVOLUTION_TRIGGER = 'evolution-trigger';
+  case EvolutionTrigger = 'evolution-trigger';
 
-  case GENGER = 'gender';
+  case Gender = 'gender';
 
-  case GENERATION = 'generation';
+  case Generation = 'generation';
 
-  case GROWTH_RATE = 'growth-rate';
+  case GrowthRate = 'growth-rate';
 
-  case ITEM = 'item';
+  case Item = 'item';
 
-  case ITEM_ATTRIBUTE = 'item-attribute';
+  case ItemAttribute = 'item-attribute';
 
-  case ITEM_CATEGORY = 'item-category';
+  case ItemCategory = 'item-category';
 
-  case ITEM_FLING_EFFECT = 'item-fling-effect';
+  case ItemFlingEffect = 'item-fling-effect';
 
-  case ITEM_POCKET = 'item-pocket';
+  case ItemPocket = 'item-pocket';
 
-  case LANGUAGE = 'language';
+  case Language = 'language';
 
-  case LOCATION_AREA = 'location-area';
+  case LocationArea = 'location-area';
 
-  case MACHINE = 'machine';
+  case Machine = 'machine';
 
-  case MOVE = 'move';
+  case Move = 'move';
 
-  case MOVE_AILMENT = 'move-ailment';
+  case MoveAilment = 'move-ailment';
 
-  case MOVE_BATTLE_STYLE = 'move-battle-style';
+  case MoveBattleStyle = 'move-battle-style';
 
-  case MOVE_CATEGORY = 'move-category';
+  case MoveCategory = 'move-category';
 
-  case MOVE_DAMAGE_CLASS = 'move-damage-class';
+  case MoveDamageClass = 'move-damage-class';
 
-  case MOVE_LEARN_METHOD = 'move-learn-method';
+  case MoveLearnMethod = 'move-learn-method';
 
-  case NATURE = 'nature';
+  case Nature = 'nature';
 
-  case PAL_PARK_AREA = 'pal-park-area';
+  case PalParkArea = 'pal-park-area';
 
-  case POKEATHLON_STAT = 'pokeathlon-stat';
+  case PokeathlonStat = 'pokeathlon-stat';
 
-  case POKEDEX = 'pokedex';
+  case Pokedex = 'pokedex';
 
-  case POKEMON = 'pokemon';
+  case Pokemon = 'pokemon';
 
-  case POKEMON_COLOR = 'pokemon-color';
+  case PokemonColor = 'pokemon-color';
 
-  case POKEMON_FORM = 'pokemon-form';
+  case PokemonForm = 'pokemon-form';
 
-  case POKEMON_HABITAT = 'pokemon-habitat';
+  case PokemonHabitat = 'pokemon-habitat';
 
-  case POKEMON_SHAPE = 'pokemon-shape';
+  case PokemonShape = 'pokemon-shape';
 
-  case POKEMON_SPECIES = 'pokemon-species';
+  case PokemonSpecies = 'pokemon-species';
 
-  case REGION = 'region';
+  case Region = 'region';
 
-  case STAT = 'stat';
+  case Stat = 'stat';
 
-  case SUPER_CONTEST_EFFECT = 'super-contest-effect';
+  case SuperContestEffect = 'super-contest-effect';
 
-  case TYPE = 'type';
+  case Type = 'type';
 
-  case VERSION = 'version';
+  case Version = 'version';
 
-  case VERSION_GROUP = 'version-group';
+  case VersionGroup = 'version-group';
 
 }

@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 /**
- * Interface for Resource.
+ * Interface for PokeAPI resource objects.
  */
 interface ResourceInterface {
 
   /**
-   * Get the endpoint.
+   * Gets the endpoint for this resource type.
    *
    * @return string
    *   The endpoint.
@@ -16,10 +18,10 @@ interface ResourceInterface {
   public static function getEndpoint(): string;
 
   /**
-   * Create a resource from an array.
+   * Creates a resource from an API response array.
    *
    * @param array $data
-   *   The data.
+   *   The API response data.
    *
    * @return static
    *   The resource.
@@ -27,10 +29,10 @@ interface ResourceInterface {
   public static function createFromArray(array $data): static;
 
   /**
-   * Get the field.
+   * Gets a field value by name.
    *
    * @param string $field
-   *   The field.
+   *   The field name.
    *
    * @return mixed
    *   The field value.
@@ -38,7 +40,7 @@ interface ResourceInterface {
   public function get(string $field): mixed;
 
   /**
-   * Get the name.
+   * Gets the resource name.
    *
    * @return string
    *   The name.
@@ -46,42 +48,42 @@ interface ResourceInterface {
   public function getName(): string;
 
   /**
-   * Set the name.
+   * Sets the resource name.
    *
    * @param string $name
    *   The name.
    */
-  public function setName(string $name);
+  public function setName(string $name): void;
 
   /**
-   * Get the id.
+   * Gets the resource ID.
    *
    * @return int
-   *   The id.
+   *   The ID.
    */
   public function getId(): int;
 
   /**
-   * Set the id.
+   * Sets the resource ID.
    *
    * @param int $id
-   *   The id.
+   *   The ID.
    */
-  public function setId(int $id);
+  public function setId(int $id): void;
 
   /**
-   * Get the url.
+   * Gets the resource URL.
    *
-   * @return string
-   *   The url.
+   * @return string|null
+   *   The URL.
    */
   public function getUrl(): ?string;
 
   /**
-   * Set the url.
+   * Sets the resource URL.
    *
    * @param string $url
-   *   The url.
+   *   The URL.
    */
   public function setUrl(string $url): void;
 

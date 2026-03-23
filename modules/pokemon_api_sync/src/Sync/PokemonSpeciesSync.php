@@ -1,23 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\pokemon_api\Endpoints;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api\Resource\PokemonSpecies;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncNodeEntity;
 
 /**
- * Sync Pokemon node.
+ * Syncs Pokémon species data to nodes.
  */
 class PokemonSpeciesSync extends SyncNodeEntity {
 
   /**
-   * List of taxonomy terms needed.
+   * Cached taxonomy terms keyed by vocabulary.
    *
-   * @var array
+   * @var array<string, array>
    */
   private array $taxonomyTerms = [];
 
@@ -31,12 +33,12 @@ class PokemonSpeciesSync extends SyncNodeEntity {
   /**
    * {@inheritdoc}
    */
-  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
+  public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
     if (empty($this->taxonomyTerms)) {
-      $this->taxonomyTerms = $this->getAllTerms();
+      $this->taxonomyTerms = $this->loadAllTerms();
     }
 
-    $pokemons = $this->pokeApi->getResources(Endpoints::POKEMON_SPECIES->value, $limit, $offset);
+    $pokemons = $this->pokeApi->getResources(Endpoints::PokemonSpecies->value, $limit, $offset);
 
     foreach ($pokemons as $pokemon) {
       $this->syncResource($pokemon);
@@ -48,50 +50,48 @@ class PokemonSpeciesSync extends SyncNodeEntity {
    */
   protected function getDataFields(ResourceInterface $resource, ?ContentEntityBase $node): array {
     if (!$resource instanceof PokemonSpecies) {
-      throw new \Exception('Invalid resource type.');
+      throw new \InvalidArgumentException('Expected PokemonSpecies resource.');
     }
 
     $generation = $resource->getGeneration();
-    $generation = $this->getTermsByApiIds('pokemon_generation', [$generation->getId() => $generation]);
+    $generationTerms = $this->getTermsByApiIds('pokemon_generation', [$generation->getId() => $generation]);
 
     return [
       'type' => 'pokemon',
       'field_pokemon_mythical' => $resource->getIsMythical(),
       'field_pokemon_legendary' => $resource->getIsLegendary(),
-      'field_pokemon_generation' => $generation,
+      'field_pokemon_generation' => $generationTerms,
     ];
   }
 
   /**
-   * Get all taxonomy terms needed.
+   * Loads all required taxonomy terms.
    *
-   * @return array
-   *   List of taxonomy terms needed.
+   * @return array<string, array>
+   *   Terms keyed by vocabulary, then by PokeAPI ID.
    */
-  private function getAllTerms(): array {
-    $generations = $this->getTermsByVid('pokemon_generation');
-
+  private function loadAllTerms(): array {
     return [
-      'pokemon_generation' => $generations,
+      'pokemon_generation' => $this->getTermsByVid('pokemon_generation'),
     ];
   }
 
   /**
-   * Get array of pokemon api IDs.
+   * Filters cached terms by PokeAPI IDs.
    *
    * @param string $vid
-   *   The vid.
+   *   The vocabulary ID.
    * @param array $resourceApiIds
-   *   The resource api ids.
+   *   Resource data keyed by PokeAPI ID.
    *
    * @return array
-   *   List of pokemon types api IDs.
+   *   Matching term IDs.
    */
   private function getTermsByApiIds(string $vid, array $resourceApiIds): array {
     $terms = [];
-    foreach ($this->taxonomyTerms[$vid] as $pokeApiId => $term) {
+    foreach ($this->taxonomyTerms[$vid] as $pokeApiId => $termId) {
       if (array_key_exists($pokeApiId, $resourceApiIds)) {
-        $terms[] = $term;
+        $terms[] = $termId;
       }
     }
 

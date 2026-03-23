@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api_sync\Sync\PokemonSync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sync Pokemon content type.
+ * Drush commands for syncing Pokémon nodes.
  */
 final class PokemonSyncCommands extends DrushCommands {
 
@@ -38,26 +40,23 @@ final class PokemonSyncCommands extends DrushCommands {
   }
 
   /**
-   * Command to synchronize pokemon.
+   * Synchronizes Pokémon data from PokeAPI.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-pokemon', aliases: ['sync-pokemon'])]
-  #[CLI\Option(name: 'limit', description: 'Limit of pokemons to sync.')]
-  #[CLI\Option(name: 'offset', description: 'Offset of pokemons to sync.')]
-  public function syncPokemon(array $options = ['limit' => PokeApi::MAX_LIMIT, 'offset' => 0]): void {
-    $connection = $this->database->startTransaction();
-    $this->logger()->log('notice', 'Synchronizing pokemons...');
+  #[CLI\Option(name: 'limit', description: 'Limit of Pokémon to sync.')]
+  #[CLI\Option(name: 'offset', description: 'Offset of Pokémon to sync.')]
+  public function syncPokemon(array $options = ['limit' => PokeApiInterface::MAX_LIMIT, 'offset' => 0]): void {
+    $transaction = $this->database->startTransaction();
+    $this->logger()->log('notice', 'Synchronizing Pokémon...');
 
     try {
       $this->pokemonSync->sync($options['limit'], $options['offset']);
-      $this->logger()->log('success', 'Pokemons synchronization successfully');
+      $this->logger()->log('success', 'Pokémon synchronization completed successfully.');
     }
     catch (\Exception $e) {
-      $connection->rollBack();
-      $this->logger()->log('error', $this->t('Failed to synchronize pokemon: @message', ['@message' => $e->getMessage()]));
-      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-        '@stack_trace' => $e->getTraceAsString(),
-      ]));
-
+      $transaction->rollBack();
+      $this->logger()->log('error', $this->t('Failed to synchronize Pokémon: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @trace', ['@trace' => $e->getTraceAsString()]));
     }
   }
 

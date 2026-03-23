@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
@@ -7,12 +9,12 @@ use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 
 /**
- * Sync node entity.
+ * Base class for syncing node entities.
  */
 abstract class SyncNodeEntity extends SyncEntity {
 
   /**
-   * Get the content type.
+   * Gets the content type machine name.
    *
    * @return string
    *   The content type.
@@ -20,15 +22,15 @@ abstract class SyncNodeEntity extends SyncEntity {
   abstract public function getContentType(): string;
 
   /**
-   * Retrieves the data fields.
+   * Gets the data fields for creating/updating a node.
    *
    * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   The resource.
    * @param \Drupal\Core\Entity\ContentEntityBase|null $node
-   *   The content entity.
+   *   The existing node, or NULL for new nodes.
    *
    * @return array
-   *   The data fields.
+   *   The field data.
    */
   abstract protected function getDataFields(ResourceInterface $resource, ?ContentEntityBase $node): array;
 
@@ -47,6 +49,7 @@ abstract class SyncNodeEntity extends SyncEntity {
       'endpoint' => $resource->getEndpoint(),
       'resource' => $resource->getId(),
     ]);
+
     $resource = $this->pokeApi->getResource($resource->getEndpoint(), $resource->getId());
 
     if (!$resource->getId()) {
@@ -66,39 +69,31 @@ abstract class SyncNodeEntity extends SyncEntity {
    *
    * @param \Drupal\pokemon_api\Resource\ResourceInterface $resource
    *   The resource to sync with.
-   * @param ?ContentEntityBase $node
-   *   The node to sync.
+   * @param \Drupal\Core\Entity\ContentEntityBase|null $node
+   *   The existing node, or NULL to create a new one.
    */
-  public function syncNode(ResourceInterface $resource, ContentEntityBase $node = NULL): void {
+  public function syncNode(ResourceInterface $resource, ?ContentEntityBase $node = NULL): void {
     $data = $this->getDataFields($resource, $node);
 
-    if ($node) {
-      $node = $this->updateEntity($node, $data);
-    }
-    else {
-      $node = $this->createEntity($data);
+    $node = $node ? $this->updateEntity($node, $data) : $this->createEntity($data);
+    if (!$node || !$resource->getName()) {
+      return;
     }
 
-    if ($node) {
-      $languages = [
-        'es',
-        'pt-br',
-      ];
+    if (!$node->isTranslatable()) {
+      return;
+    }
 
-      foreach ($languages as $language) {
-        if ($resource->getName()) {
-          if (!$node->hasTranslation($language)) {
-            $node->addTranslation($language, [
-              'title' => $resource->getName(),
-            ]);
-            $node->save();
-          }
-          else {
-            $translationNode = $node->getTranslation($language);
-            $translationNode->set('title', $resource->getName());
-            $translationNode->save();
-          }
-        }
+    $languages = ['es', 'pt-br'];
+    foreach ($languages as $language) {
+      if (!$node->hasTranslation($language)) {
+        $node->addTranslation($language, ['title' => $resource->getName()]);
+        $node->save();
+      }
+      else {
+        $translationNode = $node->getTranslation($language);
+        $translationNode->set('title', $resource->getName());
+        $translationNode->save();
       }
     }
   }
@@ -113,34 +108,29 @@ abstract class SyncNodeEntity extends SyncEntity {
     ]);
 
     $entity = array_shift($entities);
-    if ($entity instanceof ContentEntityBase) {
-      return $entity;
-    }
-
-    return NULL;
+    return $entity instanceof ContentEntityBase ? $entity : NULL;
   }
 
   /**
-   * Retrieves an array of terms based on the provided vocabulary ID.
+   * Gets taxonomy terms keyed by PokeAPI ID.
    *
    * @param string $vid
    *   The vocabulary ID.
    *
    * @return array
-   *   Array of terms where the key is the PokeAPI ID and the value is the tid.
+   *   Terms keyed by PokeAPI ID with term ID as value.
    */
   protected function getTermsByVid(string $vid): array {
     $storage = $this->entityTypeManager->getStorage('taxonomy_term');
     /** @var \Drupal\taxonomy\Entity\Term[] $terms */
-    $terms = $storage->loadByProperties([
-      'vid' => $vid,
-    ]);
+    $terms = $storage->loadByProperties(['vid' => $vid]);
 
-    foreach ($terms as $key => $term) {
-      $terms[$term->get('field_pokeapi_id')->getString()] = $term->id();
+    $result = [];
+    foreach ($terms as $term) {
+      $result[$term->get('field_pokeapi_id')->getString()] = $term->id();
     }
 
-    return $terms;
+    return $result;
   }
 
 }

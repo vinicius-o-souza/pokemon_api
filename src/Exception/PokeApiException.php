@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Exception;
 
 /**
- * Class for PokeApiException.
+ * Exception thrown by the PokeAPI client.
  */
-class PokeApiException extends \Exception {}
+final class PokeApiException extends \RuntimeException {}

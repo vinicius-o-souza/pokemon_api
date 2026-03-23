@@ -1,22 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource Generation class.
+ * Represents a Pokémon generation from the PokeAPI.
  */
 class Generation extends TranslatableResource {
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::GENERATION->value;
+    return Endpoints::Generation->value;
   }
 
 }

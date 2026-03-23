@@ -1,43 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource PokemonSpecies class.
+ * Pokemon species resource.
  */
 class PokemonSpecies extends Resource {
 
   /**
-   * The is legendary flag.
-   *
-   * @var bool
+   * Whether this Pokémon is legendary.
    */
   private bool $isLegendary = FALSE;
 
   /**
-   * The is mythical flag.
-   *
-   * @var bool
+   * Whether this Pokémon is mythical.
    */
   private bool $isMythical = FALSE;
 
   /**
-   * The generation.
-   *
-   * @var \Drupal\pokemon_api\Resource\Generation
+   * The generation this species belongs to.
    */
   private Generation $generation;
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::POKEMON_SPECIES->value;
+    return Endpoints::PokemonSpecies->value;
   }
 
   /**
@@ -45,72 +38,53 @@ class PokemonSpecies extends Resource {
    */
   public static function createFromArray(array $data): static {
     $pokemonSpecies = parent::createFromArray($data);
-    $pokemonSpecies->setIsLegendary($data['is_legendary'] ?? []);
-    $pokemonSpecies->setIsMythical($data['is_mythical'] ?? []);
+    $pokemonSpecies->setIsLegendary($data['is_legendary'] ?? FALSE);
+    $pokemonSpecies->setIsMythical($data['is_mythical'] ?? FALSE);
 
     if (isset($data['generation'])) {
-      $generation = Generation::createFromArray($data['generation']);
-      $pokemonSpecies->setGeneration($generation);
+      $pokemonSpecies->setGeneration(Generation::createFromArray($data['generation']));
     }
 
     return $pokemonSpecies;
   }
 
   /**
-   * Get the is legendary flag.
-   *
-   * @return bool
-   *   The is legendary flag.
+   * Gets whether this Pokémon is legendary.
    */
   public function getIsLegendary(): bool {
     return $this->isLegendary;
   }
 
   /**
-   * Set the is legendary flag.
-   *
-   * @param bool $isLegendary
-   *   The is legendary flag.
+   * Sets the legendary flag.
    */
   public function setIsLegendary(bool $isLegendary): void {
     $this->isLegendary = $isLegendary;
   }
 
   /**
-   * Get the is mythical flag.
-   *
-   * @return bool
-   *   The is mythical flag.
+   * Gets whether this Pokémon is mythical.
    */
   public function getIsMythical(): bool {
     return $this->isMythical;
   }
 
   /**
-   * Set the is mythical flag.
-   *
-   * @param bool $isMythical
-   *   The is mythical flag.
+   * Sets the mythical flag.
    */
   public function setIsMythical(bool $isMythical): void {
     $this->isMythical = $isMythical;
   }
 
   /**
-   * Get the generation.
-   *
-   * @return \Drupal\pokemon_api\Resource\Generation
-   *   The generation.
+   * Gets the generation.
    */
   public function getGeneration(): Generation {
     return $this->generation;
   }
 
   /**
-   * Set the generation.
-   *
-   * @param \Drupal\pokemon_api\Resource\Generation $generation
-   *   The generation.
+   * Sets the generation.
    */
   public function setGeneration(Generation $generation): void {
     $this->generation = $generation;

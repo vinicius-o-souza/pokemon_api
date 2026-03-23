@@ -1,66 +1,53 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource Move class.
+ * Represents a Pokémon move from the PokeAPI.
  */
 class Move extends TranslatableResource {
 
   use FlavorTextTrait;
 
   /**
-   * The percent value of how likely this move is to be successful.
-   *
-   * @var int
+   * The accuracy percentage (0-100).
    */
   private int $accuracy;
 
   /**
-   * The percent value of how likely it is this moves effect will happen.
-   *
-   * @var int
+   * The effect chance percentage.
    */
   private int $effectChance;
 
   /**
-   * Base power with a value of 0 if it does not have a base power.
-   *
-   * @var int
+   * The base power (0 if none).
    */
   private int $power;
 
   /**
-   * Power points. The number of times this move can be used.
-   *
-   * @var int
+   * The number of times this move can be used.
    */
   private int $powerPoints;
 
   /**
-   * Sets the order in which moves are executed during battle.
-   *
-   * @var int
+   * The execution priority (-8 to 8).
    */
   private int $priority;
 
   /**
    * The type of this move.
-   *
-   * @var \Drupal\pokemon_api\Resource\Type
    */
-  private Type|null $type;
+  private ?Type $type = NULL;
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::MOVE->value;
+    return Endpoints::Move->value;
   }
 
   /**
@@ -76,134 +63,109 @@ class Move extends TranslatableResource {
     $move->setFlavorText($data['flavor_text_entries'] ?? []);
 
     if (isset($data['type'])) {
-      $type = Type::createFromArray($data['type']);
-      $move->setType($type);
+      $move->setType(Type::createFromArray($data['type']));
     }
 
     return $move;
   }
 
   /**
-   * Gets the accuracy of this move.
-   *
-   * @return int
-   *   The accuracy of this move.
+   * Gets the accuracy.
    */
   public function getAccuracy(): int {
     return $this->accuracy;
   }
 
   /**
-   * Sets the accuracy of this move.
+   * Sets the accuracy.
    *
    * @param int $accuracy
-   *   The accuracy of this move.
+   *   The accuracy percentage (0-100).
+   *
+   * @throws \InvalidArgumentException
+   *   If accuracy is out of range.
    */
   public function setAccuracy(int $accuracy): void {
     if ($accuracy < 0 || $accuracy > 100) {
-      throw new \InvalidArgumentException('Accuracy must be between 0 and 100');
+      throw new \InvalidArgumentException('Accuracy must be between 0 and 100.');
     }
     $this->accuracy = $accuracy;
   }
 
   /**
-   * Gets the effect chance of this move.
-   *
-   * @return int
-   *   The effect chance of this move.
+   * Gets the effect chance.
    */
   public function getEffectChance(): int {
     return $this->effectChance;
   }
 
   /**
-   * Sets the effect chance of this move.
-   *
-   * @param int $effectChance
-   *   The effect chance of this move.
+   * Sets the effect chance.
    */
   public function setEffectChance(int $effectChance): void {
     $this->effectChance = $effectChance;
   }
 
   /**
-   * Gets the base power of this move.
-   *
-   * @return int
-   *   The base power of this move.
+   * Gets the base power.
    */
   public function getPower(): int {
     return $this->power;
   }
 
   /**
-   * Sets the base power of this move.
-   *
-   * @param int $power
-   *   The base power of this move.
+   * Sets the base power.
    */
   public function setPower(int $power): void {
     $this->power = $power;
   }
 
   /**
-   * Gets the power points of this move.
-   *
-   * @return int
-   *   The power points of this move.
+   * Gets the power points.
    */
   public function getPowerPoints(): int {
     return $this->powerPoints;
   }
 
   /**
-   * Sets the power points of this move.
-   *
-   * @param int $powerPoints
-   *   The power points of this move.
+   * Sets the power points.
    */
   public function setPowerPoints(int $powerPoints): void {
     $this->powerPoints = $powerPoints;
   }
 
   /**
-   * Gets the priority of this move.
-   *
-   * @return int
-   *   The priority of this move.
+   * Gets the priority.
    */
   public function getPriority(): int {
     return $this->priority;
   }
 
   /**
-   * Sets the priority of this move.
+   * Sets the priority.
    *
    * @param int $priority
-   *   The priority of this move.
+   *   The priority (-8 to 8).
+   *
+   * @throws \InvalidArgumentException
+   *   If priority is out of range.
    */
   public function setPriority(int $priority): void {
     if ($priority < -8 || $priority > 8) {
-      throw new \InvalidArgumentException('Priority must be between -8 and 8');
+      throw new \InvalidArgumentException('Priority must be between -8 and 8.');
     }
     $this->priority = $priority;
   }
 
   /**
-   * Get the type of this move.
-   *
-   * @return \Drupal\pokemon_api\Resource\Type
-   *   The type of this move.
+   * Gets the move type.
    */
-  public function getType(): Type {
+  public function getType(): ?Type {
     return $this->type;
   }
 
   /**
-   * Set the type of this move.
-   *
-   * @param \Drupal\pokemon_api\Resource\Type $type
-   *   The type of this move.
+   * Sets the move type.
    */
   public function setType(?Type $type = NULL): void {
     $this->type = $type;

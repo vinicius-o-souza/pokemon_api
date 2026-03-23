@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Drush\Commands;
 
 use Drupal\Core\Database\Connection;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api_sync\Sync\TypeSync;
 use Drush\Attributes as CLI;
 use Drush\Commands\DrushCommands;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Sync Pokemon Type taxonomy.
+ * Drush commands for syncing Pokémon types.
  */
 final class TypeSyncCommands extends DrushCommands {
 
@@ -38,27 +40,24 @@ final class TypeSyncCommands extends DrushCommands {
   }
 
   /**
-   * Command to synchronize pokemon types.
+   * Synchronizes Pokémon types from PokeAPI.
    */
   #[CLI\Command(name: 'pokemon_api_sync:sync-type', aliases: ['sync-type'])]
   #[CLI\Option(name: 'limit', description: 'Limit of types to sync.')]
   #[CLI\Option(name: 'offset', description: 'Offset of types to sync.')]
-  #[CLI\Usage(name: 'pokemon_api_sync:sync-type', description: 'Usage description')]
-  public function syncType(array $options = ['limit' => PokeApi::MAX_LIMIT, 'offset' => 0]): void {
-    $connection = $this->database->startTransaction();
-    $this->logger()->log('notice', 'Synchronizing pokemon types...');
+  #[CLI\Usage(name: 'pokemon_api_sync:sync-type', description: 'Sync all Pokémon types.')]
+  public function syncType(array $options = ['limit' => PokeApiInterface::MAX_LIMIT, 'offset' => 0]): void {
+    $transaction = $this->database->startTransaction();
+    $this->logger()->log('notice', 'Synchronizing Pokémon types...');
 
     try {
       $this->typeSync->sync($options['limit'], $options['offset']);
-      $this->logger()->log('success', 'Pokemon types synchronization successfully');
+      $this->logger()->log('success', 'Pokémon types synchronization completed successfully.');
     }
     catch (\Exception $e) {
-      $connection->rollBack();
-      $this->logger()->log('error', $this->t('Failed to synchronize pokemon types: @message', ['@message' => $e->getMessage()]));
-      $this->logger()->log('error', $this->t('Stack trace: @stack_trace', [
-        '@stack_trace' => $e->getTraceAsString(),
-      ]));
-
+      $transaction->rollBack();
+      $this->logger()->log('error', $this->t('Failed to synchronize Pokémon types: @message', ['@message' => $e->getMessage()]));
+      $this->logger()->log('error', $this->t('Stack trace: @trace', ['@trace' => $e->getTraceAsString()]));
     }
   }
 

@@ -1,6 +1,6 @@
 name: 'Pokemon API'
 type: module
-description: 'A Drupal 10 module that pull content from the Pokemon API and save into Drupal'
+description: 'A module that pulls content from the PokeAPI and saves into Drupal.'
 configure: pokemon_api.settings
 package: Custom
-core_version_requirement: ^10
+core_version_requirement: ^10 || ^11

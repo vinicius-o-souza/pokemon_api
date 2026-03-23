@@ -1,20 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Translation;
 
 /**
- * Resource TranslatableResource class.
+ * Abstract base for resources with translatable names.
  */
 abstract class TranslatableResource extends Resource implements TranslatableResourceInterface {
 
   /**
-   * The names.
-   *
-   * @var \Drupal\pokemon_api\Translation|null
+   * The translated names.
    */
-  protected Translation|null $names;
+  protected ?Translation $names = NULL;
 
   /**
    * {@inheritdoc}

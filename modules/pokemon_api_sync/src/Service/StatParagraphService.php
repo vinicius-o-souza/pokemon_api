@@ -1,68 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Service;
 
 use Drupal\Core\Entity\ContentEntityBase;
-use Drupal\Core\Entity\EntityTypeManager;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Service to manage stat paragraphs.
+ * Manages stat paragraph entities.
  */
 class StatParagraphService {
 
   /**
-   * List of stat terms.
+   * Cached stat terms keyed by PokeAPI ID.
    *
-   * @var array
+   * @var array<string, int>
    */
   private array $statTerms = [];
 
   /**
-   * Constructs a new StatParagraphService object.
+   * Constructs a StatParagraphService object.
    *
-   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityTypeManager
    *   The entity type manager.
    */
-  public function __construct(private readonly EntityTypeManager $entityTypeManager) {
-    $this->statTerms = $this->getStatTerms();
+  public function __construct(private readonly EntityTypeManagerInterface $entityTypeManager) {
+    $this->statTerms = $this->loadStatTerms();
   }
 
   /**
-   * Get or create pokemon stats.
+   * Gets or creates stat paragraphs for a Pokémon.
    *
    * @param array $pokemonStats
-   *   The stats terms.
+   *   Stats keyed by PokeAPI ID.
    * @param \Drupal\Core\Entity\ContentEntityBase|null $node
-   *   The pokemon node.
+   *   The existing Pokémon node, or NULL.
    *
    * @return array
-   *   The stats.
+   *   Paragraph reference arrays.
    */
   public function getOrCreateStatParagraphs(array $pokemonStats, ?ContentEntityBase $node): array {
     $stats = [];
+
     if ($node) {
       /** @var \Drupal\paragraphs\Entity\Paragraph[] $paragraphs */
       $paragraphs = $node->get('field_pokemon_stats')->referencedEntities();
       foreach ($paragraphs as $paragraph) {
         $statTerm = $paragraph->get('field_pokemon_stat')->entity;
-        if ($statTerm) {
-          $statPokeApiId = $statTerm->get('field_pokeapi_id')->value;
-          if ($statPokeApiId) {
-            $paragraph->set('field_pokemon_base_stat', $pokemonStats[$statPokeApiId]);
-            $paragraph->save();
-
-            $stats[] = [
-              'target_id' => $paragraph->id(),
-              'target_revision_id' => $paragraph->getRevisionId(),
-            ];
-            unset($pokemonStats[$statPokeApiId]);
-          }
+        if (!$statTerm) {
+          continue;
         }
+
+        $statPokeApiId = $statTerm->get('field_pokeapi_id')->value;
+        if (!$statPokeApiId || !isset($pokemonStats[$statPokeApiId])) {
+          continue;
+        }
+
+        $paragraph->set('field_pokemon_base_stat', $pokemonStats[$statPokeApiId]);
+        $paragraph->save();
+
+        $stats[] = [
+          'target_id' => $paragraph->id(),
+          'target_revision_id' => $paragraph->getRevisionId(),
+        ];
+        unset($pokemonStats[$statPokeApiId]);
       }
     }
 
     foreach ($pokemonStats as $key => $stat) {
-      if ($this->statTerms[$key]) {
+      if (isset($this->statTerms[$key])) {
         $stats[] = $this->createStatParagraph($this->statTerms[$key], $stat);
       }
     }
@@ -71,12 +78,12 @@ class StatParagraphService {
   }
 
   /**
-   * Retrieves the list of stat terms from the taxonomy storage.
+   * Loads stat terms from taxonomy storage.
    *
-   * @return array
-   *   Array of stats where the key is the PokeAPI ID and the value term ID.
+   * @return array<string, int>
+   *   Term IDs keyed by PokeAPI ID.
    */
-  private function getStatTerms(): array {
+  private function loadStatTerms(): array {
     /** @var \Drupal\taxonomy\Entity\Term[] $terms */
     $terms = $this->entityTypeManager->getStorage('taxonomy_term')->loadByProperties([
       'vid' => 'pokemon_stat',
@@ -84,22 +91,22 @@ class StatParagraphService {
 
     $statTerms = [];
     foreach ($terms as $term) {
-      $statTerms[$term->get('field_pokeapi_id')->getString()] = $term->id();
+      $statTerms[$term->get('field_pokeapi_id')->getString()] = (int) $term->id();
     }
 
     return $statTerms;
   }
 
   /**
-   * Create stat paragraph.
+   * Creates a stat paragraph entity.
    *
    * @param int $termId
-   *   The term id.
+   *   The stat term ID.
    * @param int $stat
-   *   The stat.
+   *   The base stat value.
    *
    * @return array
-   *   The stat paragraph.
+   *   The paragraph reference array.
    */
   private function createStatParagraph(int $termId, int $stat): array {
     $paragraph = $this->entityTypeManager->getStorage('paragraph')->create([

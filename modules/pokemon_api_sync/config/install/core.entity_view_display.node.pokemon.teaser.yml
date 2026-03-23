@@ -4,7 +4,7 @@ status: true
 dependencies:
   config:
     - core.entity_view_mode.node.teaser
-    - field.field.node.pokemon.body
+    - field.field.node.pokemon.field_description
     - field.field.node.pokemon.field_pokeapi_id
     - field.field.node.pokemon.field_pokemon_abilities
     - field.field.node.pokemon.field_pokemon_evolutions
@@ -46,7 +46,7 @@ content:
     weight: 1
     region: content
 hidden:
-  body: true
+  field_description: true
   field_pokemon_abilities: true
   field_pokemon_evolutions: true
   field_pokemon_experience: true

@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Service;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\pokemon_api\Resource\Pokemon;
 
 /**
- * Service to manage pokemon.
+ * Manages Pokémon paragraph data.
  */
 class PokemonService {
 
   /**
-   * PokemonService constructor.
+   * Constructs a PokemonService object.
    *
    * @param \Drupal\pokemon_api_sync\Service\MoveParagraphService $moveParagraphService
    *   The move paragraph service.
@@ -24,19 +26,19 @@ class PokemonService {
   ) {}
 
   /**
-   * Get pokemon stats.
+   * Gets paragraph references for a Pokémon.
    *
    * @param \Drupal\pokemon_api\Resource\Pokemon $pokemon
-   *   The pokemon.
+   *   The Pokémon resource.
    * @param \Drupal\Core\Entity\ContentEntityBase|null $node
-   *   The pokemon node.
+   *   The existing node, or NULL.
    *
    * @return array
-   *   The stats.
+   *   Paragraph references keyed by type ('moves', 'stats').
    */
   public function getParagraphs(Pokemon $pokemon, ?ContentEntityBase $node): array {
     return [
-      // 'moves' => $this->moveParagraphService->getOrCreateMoveParagraphs($pokemon->getMoves(), $node),
+      'moves' => $this->moveParagraphService->getOrCreateMoveParagraphs($pokemon->getMoves(), $node),
       'stats' => $this->statParagraphService->getOrCreateStatParagraphs($pokemon->getStats(), $node),
     ];
   }

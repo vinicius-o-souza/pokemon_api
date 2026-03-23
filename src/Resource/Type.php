@@ -1,22 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api\Resource;
 
 use Drupal\pokemon_api\Endpoints;
 
 /**
- * Resource Type class.
+ * Represents a Pokémon type from the PokeAPI.
  */
 class Type extends TranslatableResource {
 
   /**
-   * Get the endpoint.
-   *
-   * @return string
-   *   The endpoint.
+   * {@inheritdoc}
    */
   public static function getEndpoint(): string {
-    return Endpoints::TYPE->value;
+    return Endpoints::Type->value;
   }
 
 }

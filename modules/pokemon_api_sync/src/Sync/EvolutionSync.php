@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Drupal\pokemon_api_sync\Sync;
 
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\pokemon_api\Endpoints;
-use Drupal\pokemon_api\PokeApi;
+use Drupal\pokemon_api\PokeApiInterface;
 use Drupal\pokemon_api\Resource\EvolutionChain;
 use Drupal\pokemon_api\Resource\ResourceInterface;
 use Drupal\pokemon_api_sync\SyncNodeEntity;
 
 /**
- * Sync Pokemon evolution field.
+ * Syncs Pokémon evolution chains to node fields.
  */
 class EvolutionSync extends SyncNodeEntity {
 
@@ -24,8 +26,8 @@ class EvolutionSync extends SyncNodeEntity {
   /**
    * {@inheritdoc}
    */
-  public function sync(int $limit = PokeApi::MAX_LIMIT, int $offset = 0): void {
-    $evolutions = $this->pokeApi->getResources(Endpoints::EVOLUTION_CHAIN->value, $limit, $offset);
+  public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
+    $evolutions = $this->pokeApi->getResources(Endpoints::EvolutionChain->value, $limit, $offset);
 
     foreach ($evolutions as $evolution) {
       $evolution = $this->pokeApi->getResource($evolution->getEndpoint(), $evolution->getId());
@@ -41,13 +43,15 @@ class EvolutionSync extends SyncNodeEntity {
    */
   protected function getDataFields(ResourceInterface $resource, ?ContentEntityBase $node): array {
     if (!$resource instanceof EvolutionChain) {
-      throw new \Exception('Invalid resource type.');
+      throw new \InvalidArgumentException('Expected EvolutionChain resource.');
     }
 
     $evolutions = [];
     foreach ($resource->getEvolution() as $pokemonId) {
       $pokemon = $this->readEntityByPokeId($pokemonId);
-      $evolutions[] = $pokemon->id();
+      if ($pokemon) {
+        $evolutions[] = $pokemon->id();
+      }
     }
 
     return [
