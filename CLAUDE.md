@@ -172,6 +172,28 @@ pokemon_api_sync/
 
 ---
 
+## Code Quality
+
+All code must pass the following checks before being considered complete. Do not introduce new violations.
+
+```bash
+# Coding standards (Drupal + DrupalPractice)
+ddev exec vendor/bin/phpcs --standard=Drupal,DrupalPractice --extensions=php,module,install,info,yml public_html/modules/custom/
+
+# Static analysis
+ddev exec vendor/bin/phpstan
+
+# Unit / Kernel tests
+ddev exec vendor/bin/phpunit
+
+# PHPMetrics
+ddev exec vendor/bin/phpmetrics --report-html=myreport scr, modules
+```
+
+PHPMetrics must not gain new violations — keep cyclomatic complexity, method count, and coupling within thresholds defined in [DRUPAL_CODING_STANDARDS.md](DRUPAL_CODING_STANDARDS.md#17-phpmetrics--maintainability).
+
+---
+
 ## Testing
 
 Store all API response fixtures as JSON files in `tests/fixtures/`.
