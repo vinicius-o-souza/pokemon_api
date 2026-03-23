@@ -19,7 +19,7 @@ class StatSync extends SyncTermEntity {
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
-    $stats = $this->pokeApi->getResources(Endpoints::STAT->value, $limit, $offset);
+    $stats = $this->pokeApi->getResources(Endpoints::Stat->value, $limit, $offset);
 
     foreach ($stats as $stat) {
       $this->syncResource($stat);

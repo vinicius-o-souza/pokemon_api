@@ -27,7 +27,7 @@ class EvolutionSync extends SyncNodeEntity {
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
-    $evolutions = $this->pokeApi->getResources(Endpoints::EVOLUTION_CHAIN->value, $limit, $offset);
+    $evolutions = $this->pokeApi->getResources(Endpoints::EvolutionChain->value, $limit, $offset);
 
     foreach ($evolutions as $evolution) {
       $evolution = $this->pokeApi->getResource($evolution->getEndpoint(), $evolution->getId());

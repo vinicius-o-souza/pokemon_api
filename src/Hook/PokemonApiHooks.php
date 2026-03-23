@@ -10,7 +10,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 /**
  * Hook implementations for the Pokemon API module.
  */
-class PokemonApiHooks {
+final class PokemonApiHooks {
 
   /**
    * Implements hook_help().

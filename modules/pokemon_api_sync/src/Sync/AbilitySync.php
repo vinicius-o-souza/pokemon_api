@@ -19,7 +19,7 @@ class AbilitySync extends SyncTermEntity {
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
-    $abilities = $this->pokeApi->getResources(Endpoints::ABILITY->value, $limit, $offset);
+    $abilities = $this->pokeApi->getResources(Endpoints::Ability->value, $limit, $offset);
 
     foreach ($abilities as $ability) {
       $this->syncResource($ability);

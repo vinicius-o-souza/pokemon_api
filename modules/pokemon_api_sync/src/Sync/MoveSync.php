@@ -19,7 +19,7 @@ class MoveSync extends SyncTermEntity {
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
-    $moves = $this->pokeApi->getResources(Endpoints::MOVE->value, $limit, $offset);
+    $moves = $this->pokeApi->getResources(Endpoints::Move->value, $limit, $offset);
 
     foreach ($moves as $move) {
       $this->syncResource($move);

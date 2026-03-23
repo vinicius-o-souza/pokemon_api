@@ -19,7 +19,7 @@ class TypeSync extends SyncTermEntity {
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
-    $types = $this->pokeApi->getResources(Endpoints::TYPE->value, $limit, $offset);
+    $types = $this->pokeApi->getResources(Endpoints::Type->value, $limit, $offset);
 
     foreach ($types as $type) {
       $this->syncResource($type);

@@ -19,7 +19,7 @@ class GenerationSync extends SyncTermEntity {
    * {@inheritdoc}
    */
   public function sync(int $limit = PokeApiInterface::MAX_LIMIT, int $offset = 0): void {
-    $generations = $this->pokeApi->getResources(Endpoints::GENERATION->value, $limit, $offset);
+    $generations = $this->pokeApi->getResources(Endpoints::Generation->value, $limit, $offset);
 
     foreach ($generations as $generation) {
       $this->syncResource($generation);

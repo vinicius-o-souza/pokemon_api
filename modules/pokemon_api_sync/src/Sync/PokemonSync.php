@@ -62,7 +62,7 @@ class PokemonSync extends SyncNodeEntity {
       $this->taxonomyTerms = $this->loadAllTerms();
     }
 
-    $pokemons = $this->pokeApi->getResources(Endpoints::POKEMON->value, $limit, $offset);
+    $pokemons = $this->pokeApi->getResources(Endpoints::Pokemon->value, $limit, $offset);
 
     foreach ($pokemons as $pokemon) {
       $this->syncResource($pokemon);
