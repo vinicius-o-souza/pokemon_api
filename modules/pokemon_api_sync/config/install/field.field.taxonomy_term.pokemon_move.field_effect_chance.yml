@@ -3,10 +3,10 @@ langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.taxonomy_term.field_effect_change
+    - field.storage.taxonomy_term.field_effect_chance
     - taxonomy.vocabulary.pokemon_move
-id: taxonomy_term.pokemon_move.field_effect_change
-field_name: field_effect_change
+id: taxonomy_term.pokemon_move.field_effect_chance
+field_name: field_effect_chance
 entity_type: taxonomy_term
 bundle: pokemon_move
 label: 'Effect Change'

@@ -30,14 +30,12 @@ bundle: pokemon
 mode: default
 content:
   field_description:
-    type: text_textarea
+    type: string_textarea
     weight: 1
     region: content
     settings:
       rows: 9
-      summary_rows: 3
       placeholder: ''
-      show_summary: false
     third_party_settings: {  }
   created:
     type: datetime_timestamp

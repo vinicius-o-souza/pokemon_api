@@ -4,7 +4,7 @@ status: true
 dependencies:
   config:
     - field.field.taxonomy_term.pokemon_move.field_accuracy
-    - field.field.taxonomy_term.pokemon_move.field_effect_change
+    - field.field.taxonomy_term.pokemon_move.field_effect_chance
     - field.field.taxonomy_term.pokemon_move.field_pokeapi_id
     - field.field.taxonomy_term.pokemon_move.field_power
     - field.field.taxonomy_term.pokemon_move.field_power_points
@@ -34,7 +34,7 @@ content:
     third_party_settings: {  }
     weight: 1
     region: content
-  field_effect_change:
+  field_effect_chance:
     type: number_integer
     label: above
     settings:

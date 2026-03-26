@@ -30,12 +30,11 @@ bundle: pokemon
 mode: default
 content:
   field_description:
-    type: text_textarea
+    type: basic_string
+    label: above
     weight: 2
     region: content
-    settings:
-      rows: 5
-      placeholder: ''
+    settings: {  }
     third_party_settings: {  }
   field_pokeapi_id:
     type: number_integer
